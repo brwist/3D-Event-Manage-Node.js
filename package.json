@@ -1,0 +1,39 @@
+{
+  "name": "event-router",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "pretest": "`npm bin`/eslint *.js app/models/**/*.js specs/**/*.js --fix",
+    "test": "`npm bin`/nyc --reporter=text mocha specs && npm audit"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "connect-redis": "^5.2.0",
+    "debug": "^4.3.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "hbs": "^4.1.2",
+    "node-pre-gyp": "^0.17.0",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "redis": "^3.1.1",
+    "s3-proxy": "^1.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.23.0",
+    "eslint-config-airbnb-base": "^11.2.0",
+    "eslint-plugin-import": "^2.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "mocha": "^8.3.2",
+    "mock-aws-s3": "github:Babafinch/mock-aws-s3.git#master",
+    "nyc": "^15.1.0",
+    "redis-mock": "^0.56.3",
+    "supertest": "^6.1.3"
+  }
+}
