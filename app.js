@@ -60,6 +60,14 @@ passport.use(new LocalStrategy({ passReqToCallback: true },
     });
   }));
 
+function verifyAuthentication(req, res, next) {
+  if (!req.isAuthenticated()) {
+    res.status(401).end();
+  } else {
+    next();
+  }
+}
+
 passport.serializeUser((user, done) => {
   done(null, user.serialize());
 });
@@ -101,6 +109,7 @@ app.post('/:client/:event/login',
     })(req, res, next);
   });
 
+app.use(verifyAuthentication);
 app.use('/hotspots', hotspots(store));
 app.use('/:client/:event', passThrough());
 

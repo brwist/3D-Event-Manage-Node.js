@@ -19,7 +19,7 @@ module.exports = function storage(options) {
     retrieveRedirect(client, event, sourcePath, callback) {
       const key = computeHotspotKey(client, event);
       this._database.hget(key, sourcePath, (err, reply) => {
-        debug('Retrieve redirect %s %s result: %0 error: %0', key, sourcePath, reply, err);
+        debug('Retrieve redirect %s %s result: %o error: %o', key, sourcePath, reply, err);
         callback(reply);
       });
     },

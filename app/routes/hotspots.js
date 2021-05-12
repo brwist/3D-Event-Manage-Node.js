@@ -16,11 +16,7 @@ module.exports = function(store) {
   }
 
   router.get('*', (req, res) => {
-    if(req.isAuthenticated()) {
-      retrieveRedirect(res, req.user, req.originalUrl);
-    } else {
-      res.status(401).end();
-    }
+    retrieveRedirect(res, req.user, req.originalUrl);
   });
 
   return router;
