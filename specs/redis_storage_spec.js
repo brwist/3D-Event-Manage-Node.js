@@ -1,7 +1,6 @@
 const assert = require('assert');
 const redis = require('redis-mock');
 const Attendee = require('../app/models/attendee');
-const EventConfiguration = require('../app/models/event_configuration');
 const storage = require('../app/models/redis_storage_adapter');
 
 describe('RedisStorage', () => {
@@ -91,32 +90,34 @@ describe('RedisStorage', () => {
   });
 
   context('event configuration', () => {
-    let eventConfiguration;
-    let eventId;
+    let attendee; let accessor; let
+      value;
     before(() => {
-      eventConfiguration = new EventConfiguration({
-        config: { url: 'default-configuration' },
+      attendee = new Attendee({
+        client,
+        event,
       });
-      eventId = 'an_event';
+      accessor = 'default_room';
+      value = '/index.html';
     });
 
     it('stores event configuration', () => {
-      subject.storeEventConfiguration(eventId, eventConfiguration);
+      subject.storeEventConfiguration(attendee, accessor, value);
 
-      database.hget('default-room', eventId, (err, reply) => {
-        assert(eventConfiguration.isEqual(EventConfiguration.restore(reply)));
+      database.get(`configuration.${attendee.client}.${attendee.event}.${accessor}`, (err, reply) => {
+        assert.strictEqual(value, reply);
       });
     });
 
     it('retrieve event configuration', () => {
-      subject.retrieveEventConfiguration(eventId, (err, foundEventConfiguration) => {
+      subject.retrieveEventConfiguration(attendee, accessor, (err, foundEventConfiguration) => {
         assert.strictEqual(err, null);
-        assert(eventConfiguration.isEqual(foundEventConfiguration));
+        assert.strictEqual(value, foundEventConfiguration);
       });
     });
 
     it('returns error when event configuration not found', () => {
-      subject.retrieveEventConfiguration('random-event', (err, foundEventConfiguration) => {
+      subject.retrieveEventConfiguration(attendee, 'random-accessor', (err, foundEventConfiguration) => {
         assert.strictEqual(err === null, false);
         assert.strictEqual(foundEventConfiguration, null);
       });

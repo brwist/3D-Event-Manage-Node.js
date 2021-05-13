@@ -11,7 +11,8 @@ const Attendee = require('./app/models/attendee');
 const hotspots = require('./app/routes/hotspots');
 const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
-const { authenticateHotspots, authenticateClientEvent } = require('./app/middlewares');
+const { authenticate, authenticateClientEvent } = require('./app/middlewares/authenticate');
+const { redirectToLogin } = require('./app/utils/redirect');
 
 const privateKey = process.env.SESSION_KEY;
 
@@ -89,7 +90,7 @@ app.post('/:client/:event/login',
   (req, res, next) => {
     passport.authenticate('local', (err, user) => {
       if (err || !user) {
-        res.redirect(req.originalUrl);
+        redirectToLogin(req, res);
       } else {
         req.logIn(user, (loginErr) => {
           if (loginErr) { throw loginErr; }
@@ -101,7 +102,7 @@ app.post('/:client/:event/login',
     })(req, res, next);
   });
 
-app.use('/hotspots', authenticateHotspots, hotspots(store));
+app.use('/hotspots', authenticate, hotspots(store));
 app.use('/:client/:event', authenticateClientEvent, passThrough());
 
 app.get('/redirect_page', (req, res) => {
