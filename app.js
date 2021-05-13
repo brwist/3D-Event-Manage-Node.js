@@ -11,7 +11,7 @@ const Attendee = require('./app/models/attendee');
 const hotspots = require('./app/routes/hotspots');
 const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
-const { authenticateHotspots, authenticateClientEvent } = require('./app/middlewares');
+const { authenticateHotspots, authenticateClientEvent } = require('./app/middlewares/authenticate');
 
 const privateKey = process.env.SESSION_KEY;
 
