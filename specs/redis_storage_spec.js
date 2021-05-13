@@ -1,6 +1,7 @@
 const assert = require('assert');
 const redis = require('redis-mock');
 const Attendee = require('../app/models/attendee');
+const EventConfiguration = require('../app/models/event_configuration');
 const storage = require('../app/models/redis_storage_adapter');
 
 describe('RedisStorage', () => {
@@ -85,6 +86,39 @@ describe('RedisStorage', () => {
           assert.strictEqual(err === null, false);
           assert.strictEqual(foundAttendee, null);
         });
+      });
+    });
+  });
+
+  context('event configuration', () => {
+    let eventConfiguration;
+    let eventId;
+    before(() => {
+      eventConfiguration = new EventConfiguration({
+        config: { url: 'default-configuration' },
+      });
+      eventId = 'an_event';
+    });
+
+    it('stores event configuration', () => {
+      subject.storeEventConfiguration(eventId, eventConfiguration);
+
+      database.hget('default-room', eventId, (err, reply) => {
+        assert(eventConfiguration.isEqual(EventConfiguration.restore(reply)));
+      });
+    });
+
+    it('retrieve event configuration', () => {
+      subject.retrieveEventConfiguration(eventId, (err, foundEventConfiguration) => {
+        assert.strictEqual(err, null);
+        assert(eventConfiguration.isEqual(foundEventConfiguration));
+      });
+    });
+
+    it('returns error when event configuration not found', () => {
+      subject.retrieveEventConfiguration('random-event', (err, foundEventConfiguration) => {
+        assert.strictEqual(err === null, false);
+        assert.strictEqual(foundEventConfiguration, null);
       });
     });
   });
