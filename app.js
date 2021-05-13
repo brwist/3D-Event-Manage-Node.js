@@ -104,6 +104,15 @@ app.post('/:client/:event/login',
 app.use('/hotspots', authenticateHotspots, hotspots(store));
 app.use('/:client/:event', authenticateClientEvent, passThrough());
 
+app.get('/redirect_page', (req, res) => {
+  const type = req.query.type;
+  res.locals = {
+    newPage: type === 'new_page',
+    link: '/hotspots',
+  };
+  res.render('redirect_link');
+});
+
 if (__filename === process.argv[1]) {
   const port = process.env.PORT || '5000';
 
