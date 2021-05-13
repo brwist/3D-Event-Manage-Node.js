@@ -60,7 +60,12 @@ describe('App', () => {
       it('does not allow ', (done) => {
         request(app)
           .get(eventRoot)
-          .expect(401, done);
+          .expect(302, done);
+      });
+      it('redirects to login', (done) => {
+        request(app)
+          .get(eventRoot)
+          .expect('Location', `${eventRoot}/login`, done);
       });
     });
   });
