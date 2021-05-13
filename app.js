@@ -11,6 +11,7 @@ const Attendee = require('./app/models/attendee');
 const hotspots = require('./app/routes/hotspots');
 const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
+const { verifyAuthentication } = require('./app/middlewares');
 
 const privateKey = process.env.SESSION_KEY;
 
@@ -60,14 +61,6 @@ passport.use(new LocalStrategy({ passReqToCallback: true },
     });
   }));
 
-function verifyAuthentication(req, res, next) {
-  if (!req.isAuthenticated()) {
-    res.status(401).end();
-  } else {
-    next();
-  }
-}
-
 passport.serializeUser((user, done) => {
   done(null, user.serialize());
 });
@@ -100,8 +93,7 @@ app.post('/:client/:event/login',
       } else {
         req.logIn(user, (loginErr) => {
           if (loginErr) { throw loginErr; }
-          const { client } = req.params;
-          const { event } = req.params;
+          const { client, event } = req.params;
 
           res.redirect(`/${client}/${event}`);
         });
