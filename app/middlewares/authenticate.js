@@ -1,5 +1,6 @@
+const {redirectToLogin} = require('../utils/redirect')
 
-function authenticateHotspots(req, res, next) {
+function authenticate(req, res, next) {
   if (!req.isAuthenticated()) {
     res.status(401).end();
   } else {
@@ -9,13 +10,13 @@ function authenticateHotspots(req, res, next) {
 
 function authenticateClientEvent(req, res, next) {
   if (!req.isAuthenticated()) {
-    const { client, event } = req.params
-    res.status(302).redirect(`/${client}/${event}/login`);
+    redirectToLogin(req,res);
   } else {
     next();
   }
 }
+
 module.exports = {
-  authenticateHotspots,
+  authenticate,
   authenticateClientEvent
 }

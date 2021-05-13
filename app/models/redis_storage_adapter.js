@@ -1,7 +1,6 @@
 const debug = require('debug')('redis-storage-adapter');
 
 const Attendee = require('./attendee');
-const EventConfiguration = require('./event_configuration');
 
 module.exports = function storage(options) {
   function computeEventKey(client, event) {
@@ -12,8 +11,8 @@ module.exports = function storage(options) {
     return `hotspot.${client}.${event}`;
   }
 
-  function getDefaultRoomKey() {
-    return 'default-room';
+  function getConfigurationKey(client, event, accessor) {
+    return `configuration.${client}.${event}.${accessor}`;
   }
 
   return {
@@ -40,16 +39,15 @@ module.exports = function storage(options) {
         }
       });
     },
-    storeEventConfiguration(event, config) {
-      const eventConfiguration = new EventConfiguration(config);
-      this._database.hset(getDefaultRoomKey(), event, eventConfiguration.serialize());
+    storeEventConfiguration(attendee, accessor, value) {
+      this._database.set(getConfigurationKey(attendee.client, attendee.event, accessor), value);
     },
-    retrieveEventConfiguration(event, callback) {
-      this._database.hget(getDefaultRoomKey(), event, (err, reply) => {
+    retrieveEventConfiguration(attendee, accessor, callback) {
+      this._database.get(getConfigurationKey(attendee.client, attendee.event, accessor), (err, reply) => {
         if (!reply) {
-          callback(`Default Room Not Found for Event ${event}`, null);
+          callback(`${accessor} Not Found`, null);
         } else {
-          callback(null, EventConfiguration.restore(reply));
+          callback(null, reply);
         }
       });
     },
