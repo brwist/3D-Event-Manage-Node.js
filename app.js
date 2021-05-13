@@ -11,7 +11,7 @@ const Attendee = require('./app/models/attendee');
 const hotspots = require('./app/routes/hotspots');
 const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
-const { verifyAuthentication, clientEventAuthentication } = require('./app/middlewares');
+const { authenticateHotspots, authenticateClientEvent } = require('./app/middlewares');
 
 const privateKey = process.env.SESSION_KEY;
 
@@ -101,8 +101,8 @@ app.post('/:client/:event/login',
     })(req, res, next);
   });
 
-app.use('/hotspots', verifyAuthentication, hotspots(store));
-app.use('/:client/:event', clientEventAuthentication, passThrough());
+app.use('/hotspots', authenticateHotspots, hotspots(store));
+app.use('/:client/:event', authenticateClientEvent, passThrough());
 
 if (__filename === process.argv[1]) {
   const port = process.env.PORT || '5000';
