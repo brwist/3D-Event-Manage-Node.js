@@ -107,7 +107,10 @@ app.use('/hotspots', authenticate, hotspots(store));
 app.get('/:client/:event/attendees', authenticateClientEvent, (req, res) => {
   const { client, event } = req.params;
   store.listAttendee(client, event, (err, attendees) => {
-    res.locals = { attendees };
+    let content = '<ul>';
+    content += attendees.map(attendee => `<li>${attendee.name}</li>`).join('');
+    content += '<ul>';
+    res.locals = { content };
     res.render('attendees');
   });
 });
