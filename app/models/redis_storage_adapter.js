@@ -39,6 +39,15 @@ module.exports = function storage(options) {
         }
       });
     },
+    listAttendee(client, event, callback) {
+      this._database.hvals(computeEventKey(client, event), (err, reply) => {
+        if (!reply) {
+          callback('Attendees Not Found', null);
+        } else {
+          callback(null, reply.map(attendee => Attendee.restore(attendee)));
+        }
+      });
+    },
     storeEventConfiguration(attendee, accessor, value) {
       this._database.set(getConfigurationKey(attendee.client, attendee.event, accessor), value);
     },

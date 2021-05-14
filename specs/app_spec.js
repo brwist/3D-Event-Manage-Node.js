@@ -68,6 +68,18 @@ describe('App', () => {
           .expect('Location', `${eventRoot}/login`, done);
       });
     });
+    context('attendees', () => {
+      it('does not allow ', (done) => {
+        request(app)
+          .get(`${eventRoot}/attendees`)
+          .expect(302, done);
+      });
+      it('redirects to login', (done) => {
+        request(app)
+          .get(`${eventRoot}/attendees`)
+          .expect('Location', `${eventRoot}/login`, done);
+      });
+    });
   });
 
   describe('logging in', () => {
@@ -112,6 +124,15 @@ describe('App', () => {
         .post(`${eventRoot}/login`)
         .send({ username: attendee.email, password })
         .end(done);
+    });
+
+    context('attendees', () => {
+      const attendeesUrl = `${eventRoot}/attendees`;
+      it('shows attendees page', (done) => {
+        agent
+          .get(attendeesUrl)
+          .expect(200, done);
+      });
     });
 
     context('hotspots', () => {
