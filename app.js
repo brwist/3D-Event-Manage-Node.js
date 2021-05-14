@@ -46,8 +46,8 @@ function environment(app) {
 }
 
 const app = express();
-const environementFactory = environment(app);
-const redisClient = environementFactory.createRedisClient();
+const environmentFactory = environment(app);
+const redisClient = environmentFactory.createRedisClient();
 const store = createStorage({ database: redisClient });
 
 passport.use(new LocalStrategy({ passReqToCallback: true },
@@ -72,7 +72,7 @@ passport.deserializeUser((user, done) => {
 
 app.use(express.urlencoded());
 app.use(express.json());
-environementFactory.setupSession(redisClient);
+environmentFactory.setupSession(redisClient);
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -103,6 +103,15 @@ app.post('/:client/:event/login',
   });
 
 app.use('/hotspots', authenticate, hotspots(store));
+
+app.get('/:client/:event/attendees', authenticateClientEvent, (req, res) => {
+  const { client, event } = req.params;
+  store.listAttendee(client, event, (err, attendees) => {
+    res.locals = { attendees };
+    res.render('attendees');
+  });
+});
+
 app.use('/:client/:event', authenticateClientEvent, passThrough());
 
 app.get('/redirect_page', (req, res) => {

@@ -74,6 +74,24 @@ describe('RedisStorage', () => {
       });
     });
 
+    it('list Attendees', () => {
+      // save second attendee
+      const secondAttendee = new Attendee({
+        client,
+        event,
+        name: 'Gareth Bale',
+        email: 'gbale@thfc.com',
+        password: 'random123',
+      });
+      subject.storeAttendee(secondAttendee);
+
+      subject.listAttendee(attendee.client, attendee.event, (err, foundAttendees) => {
+        assert.strictEqual(err, null);
+        assert.strictEqual(foundAttendees.length, 2);
+        assert.deepStrictEqual([attendee, secondAttendee], foundAttendees);
+      });
+    });
+
     it('returns error when attendee not found', () => {
       subject.retrieveAttendee(attendee.client, attendee.event, 'nobody', (err, foundAttendee) => {
         assert.strictEqual(err === null, false);
