@@ -23,9 +23,11 @@ describe('RedisStorage', () => {
   context('redirect', () => {
     const sourcePath = '/acd/efg.html';
     const destinationUrl = 'https://test.com';
+    const tooltip = 'tooltip1';
     const redirect = {
       client,
       event,
+      tooltip,
       source_path: sourcePath,
       destination_url: destinationUrl,
     };
@@ -33,16 +35,19 @@ describe('RedisStorage', () => {
     it('stores url for an event', () => {
       subject.storeRedirect(redirect);
 
-      database.hget(`hotspot.${client}.${event}`, sourcePath, (err, reply) => {
-        assert.strictEqual(reply, destinationUrl);
+      database.hget(`hotspot.${client}.${event}`, sourcePath, (err, rawHotspot) => {
+        const hotspot = JSON.parse(rawHotspot);
+        assert.strictEqual(hotspot.url, destinationUrl);
+        assert.strictEqual(hotspot.tooltip, tooltip);
       });
     });
 
     it('fetches destination', () => {
       subject.storeRedirect(redirect);
 
-      subject.retrieveRedirect(client, event, sourcePath, (url) => {
-        assert.strictEqual(url, destinationUrl);
+      subject.retrieveRedirect(client, event, sourcePath, (hotspot) => {
+        assert.strictEqual(hotspot.url, destinationUrl);
+        assert.strictEqual(hotspot.tooltip, tooltip);
       });
     });
   });

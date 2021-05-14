@@ -6,9 +6,9 @@ const router = express.Router();
 module.exports = function(store) {
   function retrieveRedirect(res, attendee, originalUrl) {
     const key = url.parse(originalUrl).pathname;
-    store.retrieveRedirect(attendee.client, attendee.event, key, (url) => {
-      if(url) {
-        res.redirect(url);
+    store.retrieveRedirect(attendee.client, attendee.event, key, (redirect) => {
+      if(redirect && redirect.url) {
+        res.redirect(redirect.url);
       } else {
         res.status(404).end();
       }

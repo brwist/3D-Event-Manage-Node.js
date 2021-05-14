@@ -18,13 +18,14 @@ module.exports = function storage(options) {
   return {
     _database: options.database,
     storeRedirect(value) {
-      this._database.hset(computeHotspotKey(value.client, value.event), value.source_path, value.destination_url);
+      const content = JSON.stringify({ url: value.destination_url, tooltip: value.tooltip });
+      this._database.hset(computeHotspotKey(value.client, value.event), value.source_path, content);
     },
     retrieveRedirect(client, event, sourcePath, callback) {
       const key = computeHotspotKey(client, event);
       this._database.hget(key, sourcePath, (err, reply) => {
         debug('Retrieve redirect %s %s result: %o error: %o', key, sourcePath, reply, err);
-        callback(reply);
+        callback(JSON.parse(reply));
       });
     },
     storeAttendee(attendee) {
