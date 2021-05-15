@@ -13,6 +13,7 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
+    "aws-sdk": "^2.907.0",
     "bcrypt": "^5.0.1",
     "connect-redis": "^5.2.0",
     "debug": "^4.3.1",

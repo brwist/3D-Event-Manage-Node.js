@@ -23,6 +23,7 @@ describe('App', () => {
 
   const email = 'pedro@pepito.com';
   const password = 'caliente';
+  const tooltip = 'Living room';
   const eventRoot = `/${client}/${event}`;
 
   const attendee = new Attendee({
@@ -34,6 +35,14 @@ describe('App', () => {
     client: attendee.client,
     event: attendee.event,
     destination_url: destinationUrl,
+    tooltip,
+  };
+  const secondRedirect = {
+    client: attendee.client,
+    event: attendee.event,
+    source_path: 8,
+    destination_url: destinationUrl,
+    tooltip,
   };
 
   let database;
@@ -43,6 +52,7 @@ describe('App', () => {
     database = redisMock.createClient();
     storage = createStorage({ database });
     storage.storeRedirect(redirect);
+    storage.storeRedirect(secondRedirect);
   });
 
   after(() => {
@@ -177,6 +187,30 @@ describe('App', () => {
           .get(`${eventRoot}/something/something.html`)
           .expect((res) => {
             assert.strictEqual(res.text, content);
+          })
+          .expect(200, done);
+      });
+    });
+
+    context('my check', () => {
+      const content = '<html><body>Hello</body></html>';
+      let s3;
+
+      before((done) => {
+        s3 = AWSMock.S3({
+          params: { Bucket: 'experiences' },
+        });
+
+        s3.putObject({ Key: 'locale/en.txt', Body: content }, () => {
+          done();
+        });
+      });
+
+      it('returns the modified locale/en.txt file', (done) => {
+        agent
+          .get(`${eventRoot}/locale/en.txt`)
+          .expect((res) => {
+            assert.strictEqual(res.text, tooltip);
           })
           .expect(200, done);
       });

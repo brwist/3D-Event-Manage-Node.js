@@ -112,7 +112,7 @@ app.get('/:client/:event/attendees', authenticateClientEvent, (req, res) => {
   });
 });
 
-app.use('/:client/:event', authenticateClientEvent, passThrough());
+app.use('/:client/:event', authenticateClientEvent, passThrough(store));
 
 if (__filename === process.argv[1]) {
   const port = process.env.PORT || '5000';
