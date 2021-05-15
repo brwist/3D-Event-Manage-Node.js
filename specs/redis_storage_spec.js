@@ -39,7 +39,7 @@ describe('RedisStorage', () => {
 
       database.hget(`hotspot.${client}.${event}`, hotspotId, (err, rawHotspot) => {
         const hotspot = JSON.parse(rawHotspot);
-        assert.strictEqual(hotspot.url, destinationUrl);
+        assert.strictEqual(hotspot.destination_url, destinationUrl);
         assert.strictEqual(hotspot.tooltip, tooltip);
         assert.strictEqual(hotspot.type, type);
       });
@@ -49,9 +49,8 @@ describe('RedisStorage', () => {
       subject.storeRedirect(redirect);
 
       subject.retrieveRedirect(client, event, hotspotId, (hotspot) => {
-        assert.strictEqual(hotspot.url, destinationUrl);
+        assert.strictEqual(hotspot.destination_url, destinationUrl);
         assert.strictEqual(hotspot.tooltip, tooltip);
-        assert.strictEqual(hotspot.type, type);
         assert.strictEqual(hotspot.type, type);
       });
     });

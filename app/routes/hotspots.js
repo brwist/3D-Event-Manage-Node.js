@@ -9,8 +9,8 @@ module.exports = function(store) {
     const key = path.substring(path.lastIndexOf('/') + 1);
 
     store.retrieveRedirect(attendee.client, attendee.event, key, (redirect) => {
-      if(redirect && redirect.url) {
-        res.redirect(redirect.url);
+      if(redirect && redirect.destination_url) {
+        res.redirect(redirect.destination_url);
       } else {
         res.status(404).end();
       }
