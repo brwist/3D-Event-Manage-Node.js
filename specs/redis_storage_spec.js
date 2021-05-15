@@ -21,21 +21,21 @@ describe('RedisStorage', () => {
   });
 
   context('redirect', () => {
-    const sourcePath = '/acd/efg.html';
+    const hotspotId = 'an_id';
     const destinationUrl = 'https://test.com';
     const tooltip = 'tooltip1';
     const redirect = {
+      id: hotspotId,
       client,
       event,
       tooltip,
-      source_path: sourcePath,
       destination_url: destinationUrl,
     };
 
     it('stores url for an event', () => {
       subject.storeRedirect(redirect);
 
-      database.hget(`hotspot.${client}.${event}`, sourcePath, (err, rawHotspot) => {
+      database.hget(`hotspot.${client}.${event}`, hotspotId, (err, rawHotspot) => {
         const hotspot = JSON.parse(rawHotspot);
         assert.strictEqual(hotspot.url, destinationUrl);
         assert.strictEqual(hotspot.tooltip, tooltip);
@@ -45,7 +45,7 @@ describe('RedisStorage', () => {
     it('fetches destination', () => {
       subject.storeRedirect(redirect);
 
-      subject.retrieveRedirect(client, event, sourcePath, (hotspot) => {
+      subject.retrieveRedirect(client, event, hotspotId, (hotspot) => {
         assert.strictEqual(hotspot.url, destinationUrl);
         assert.strictEqual(hotspot.tooltip, tooltip);
       });
@@ -108,41 +108,6 @@ describe('RedisStorage', () => {
           assert.strictEqual(err === null, false);
           assert.strictEqual(foundAttendee, null);
         });
-      });
-    });
-  });
-
-  context('event configuration', () => {
-    let attendee; let accessor; let
-      value;
-    before(() => {
-      attendee = new Attendee({
-        client,
-        event,
-      });
-      accessor = 'default_room';
-      value = '/index.html';
-    });
-
-    it('stores event configuration', () => {
-      subject.storeEventConfiguration(attendee, accessor, value);
-
-      database.get(`configuration.${attendee.client}.${attendee.event}.${accessor}`, (err, reply) => {
-        assert.strictEqual(value, reply);
-      });
-    });
-
-    it('retrieve event configuration', () => {
-      subject.retrieveEventConfiguration(attendee, accessor, (err, foundEventConfiguration) => {
-        assert.strictEqual(err, null);
-        assert.strictEqual(value, foundEventConfiguration);
-      });
-    });
-
-    it('returns error when event configuration not found', () => {
-      subject.retrieveEventConfiguration(attendee, 'random-accessor', (err, foundEventConfiguration) => {
-        assert.strictEqual(err === null, false);
-        assert.strictEqual(foundEventConfiguration, null);
       });
     });
   });

@@ -11,15 +11,11 @@ module.exports = function storage(options) {
     return `hotspot.${client}.${event}`;
   }
 
-  function getConfigurationKey(client, event, accessor) {
-    return `configuration.${client}.${event}.${accessor}`;
-  }
-
   return {
     _database: options.database,
     storeRedirect(value) {
       const content = JSON.stringify({ url: value.destination_url, tooltip: value.tooltip });
-      this._database.hset(computeHotspotKey(value.client, value.event), value.source_path, content);
+      this._database.hset(computeHotspotKey(value.client, value.event), value.id, content);
     },
     retrieveRedirect(client, event, sourcePath, callback) {
       const key = computeHotspotKey(client, event);
@@ -46,18 +42,6 @@ module.exports = function storage(options) {
           callback('Attendees Not Found', null);
         } else {
           callback(null, reply.map(attendee => Attendee.restore(attendee)));
-        }
-      });
-    },
-    storeEventConfiguration(attendee, accessor, value) {
-      this._database.set(getConfigurationKey(attendee.client, attendee.event, accessor), value);
-    },
-    retrieveEventConfiguration(attendee, accessor, callback) {
-      this._database.get(getConfigurationKey(attendee.client, attendee.event, accessor), (err, reply) => {
-        if (!reply) {
-          callback(`${accessor} Not Found`, null);
-        } else {
-          callback(null, reply);
         }
       });
     },
