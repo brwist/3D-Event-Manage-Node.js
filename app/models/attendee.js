@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt');
 
+const { marshall, unMarshall } = require('../utils/parser');
+
 function encryptPassword(password) {
   const salt = bcrypt.genSaltSync(10);
 
@@ -53,7 +55,7 @@ class Attendee {
   }
 
   serialize() {
-    return JSON.stringify({
+    return marshall({
       client: this.client,
       event: this.event,
       name: this.name,
@@ -63,7 +65,7 @@ class Attendee {
   }
 
   static restore(serialized) {
-    return new Attendee(JSON.parse(serialized));
+    return new Attendee(unMarshall(serialized));
   }
 }
 

@@ -2,6 +2,7 @@ const assert = require('assert');
 const bcrypt = require('bcrypt');
 
 const Attendee = require('../app/models/attendee');
+const { marshall } = require('../app/utils/parser');
 
 describe('Attendee', () => {
   context('event user', () => {
@@ -44,7 +45,7 @@ describe('Attendee', () => {
     });
 
     it('serializes', () => {
-      assert(JSON.stringify(attendee), attendee.serialize());
+      assert(marshall(attendee), attendee.serialize());
     });
 
     it('deserializes', () => {

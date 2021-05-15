@@ -2,6 +2,8 @@ const debug = require('debug')('redis-storage-adapter');
 
 const Attendee = require('./attendee');
 
+const { marshall, unMarshall } = require('../utils/parser');
+
 module.exports = function storage(options) {
   function computeEventKey(client, event) {
     return `attendee.${client}.${event}`;
@@ -14,14 +16,14 @@ module.exports = function storage(options) {
   return {
     _database: options.database,
     storeRedirect(value) {
-      const content = JSON.stringify({ destination_url: value.destination_url, tooltip: value.tooltip, type: value.type });
+      const content = marshall({ destination_url: value.destination_url, tooltip: value.tooltip, type: value.type });
       this._database.hset(computeHotspotKey(value.client, value.event), value.id, content);
     },
     retrieveRedirect(client, event, sourcePath, callback) {
       const key = computeHotspotKey(client, event);
       this._database.hget(key, sourcePath, (err, reply) => {
         debug('Retrieve redirect %s %s result: %o error: %o', key, sourcePath, reply, err);
-        callback(JSON.parse(reply));
+        callback(unMarshall(reply));
       });
     },
     storeAttendee(attendee) {

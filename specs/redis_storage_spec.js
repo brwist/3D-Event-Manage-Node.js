@@ -2,6 +2,7 @@ const assert = require('assert');
 const redis = require('redis-mock');
 const Attendee = require('../app/models/attendee');
 const storage = require('../app/models/redis_storage_adapter');
+const { unMarshall } = require('../app/utils/parser');
 
 describe('RedisStorage', () => {
   const client = 'a_client';
@@ -38,7 +39,7 @@ describe('RedisStorage', () => {
       subject.storeRedirect(redirect);
 
       database.hget(`hotspot.${client}.${event}`, hotspotId, (err, rawHotspot) => {
-        const hotspot = JSON.parse(rawHotspot);
+        const hotspot = unMarshall(rawHotspot);
         assert.strictEqual(hotspot.destination_url, destinationUrl);
         assert.strictEqual(hotspot.tooltip, tooltip);
         assert.strictEqual(hotspot.type, type);
