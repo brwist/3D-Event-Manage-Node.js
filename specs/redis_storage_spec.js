@@ -24,11 +24,13 @@ describe('RedisStorage', () => {
     const hotspotId = 'an_id';
     const destinationUrl = 'https://test.com';
     const tooltip = 'tooltip1';
+    const type = 'new_page';
     const redirect = {
       id: hotspotId,
       client,
       event,
       tooltip,
+      type,
       destination_url: destinationUrl,
     };
 
@@ -39,6 +41,7 @@ describe('RedisStorage', () => {
         const hotspot = JSON.parse(rawHotspot);
         assert.strictEqual(hotspot.url, destinationUrl);
         assert.strictEqual(hotspot.tooltip, tooltip);
+        assert.strictEqual(hotspot.type, type);
       });
     });
 
@@ -48,6 +51,8 @@ describe('RedisStorage', () => {
       subject.retrieveRedirect(client, event, hotspotId, (hotspot) => {
         assert.strictEqual(hotspot.url, destinationUrl);
         assert.strictEqual(hotspot.tooltip, tooltip);
+        assert.strictEqual(hotspot.type, type);
+        assert.strictEqual(hotspot.type, type);
       });
     });
   });

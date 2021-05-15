@@ -14,7 +14,7 @@ module.exports = function storage(options) {
   return {
     _database: options.database,
     storeRedirect(value) {
-      const content = JSON.stringify({ url: value.destination_url, tooltip: value.tooltip });
+      const content = JSON.stringify({ url: value.destination_url, tooltip: value.tooltip, type: value.type });
       this._database.hset(computeHotspotKey(value.client, value.event), value.id, content);
     },
     retrieveRedirect(client, event, sourcePath, callback) {
