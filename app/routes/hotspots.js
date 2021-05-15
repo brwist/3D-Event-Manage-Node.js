@@ -10,7 +10,11 @@ module.exports = function(store) {
 
     store.retrieveRedirect(attendee.client, attendee.event, key, (redirect) => {
       if(redirect && redirect.destination_url) {
-        res.redirect(redirect.destination_url);
+        if(redirect.type === 'new_page') {
+          res.render(redirect.destination_url);
+        } else {
+          res.redirect(redirect.destination_url);
+        }
       } else {
         res.status(404).end();
       }
