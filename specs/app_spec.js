@@ -205,10 +205,13 @@ describe('App', () => {
             done();
           });
         });
-        it('return internal server error', (done) => {
+        it('returns file as it is', (done) => {
           agent
             .get(`${eventRoot}/locale/en.txt`)
-            .expect(500, done);
+            .expect((res) => {
+              assert.strictEqual(res.text, content);
+            })
+            .expect(200, done);
         });
       });
       context('when tooltip found in redis', () => {
