@@ -1,12 +1,8 @@
 const express = require('express');
 const s3Proxy = require('s3-proxy');
 const AWS = require('aws-sdk');
-const {downloadFromS3} = require('../utils/s3');
-const bucket = process.env.EXPERIENCE_BUCKET || 'experiences'
-const awsConfig = {
-  accessKeyId: process.env.EXPERIENCE_ACCESS_KEY_ID,
-  secretAccessKey: process.env.EXPERIENCE_SECRET_ACCESS_KEY,
-};
+const { downloadFromS3 } = require('../utils/s3');
+const { awsConfig, bucket } = require('../configs/aws');
 
 AWS.config.update({...awsConfig});
 
