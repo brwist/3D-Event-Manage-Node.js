@@ -20,7 +20,6 @@ module.exports = function(store) {
       Bucket: bucket,
       Key: 'locale/en.txt'
     };
-    console.log(s3Client.getObject(config).promise);
     s3Client.getObject(config).promise().then(async (data) => {
       const { client, event } = req.params;
       let text = data.Body.toString();
