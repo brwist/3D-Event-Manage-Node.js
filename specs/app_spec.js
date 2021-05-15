@@ -191,27 +191,47 @@ describe('App', () => {
       });
     });
 
-    context('my check', () => {
-      const content = '<html><body>Hello</body></html>';
-      let s3;
+    context('pass through for /locale/en.txt', () => {
+      context('when tooltip not found in redis', () => {
+        const content = 'hotspots.1';
+        let s3;
 
-      before((done) => {
-        s3 = AWSMock.S3({
-          params: { Bucket: 'experiences' },
+        before((done) => {
+          s3 = AWSMock.S3({
+            params: { Bucket: 'experiences' },
+          });
+
+          s3.putObject({ Key: 'locale/en.txt', Body: content }, () => {
+            done();
+          });
         });
-
-        s3.putObject({ Key: 'locale/en.txt', Body: content }, () => {
-          done();
+        it('return internal server error', (done) => {
+          agent
+            .get(`${eventRoot}/locale/en.txt`)
+            .expect(500, done);
         });
       });
+      context('when tooltip found in redis', () => {
+        const content = 'hotspots.8';
+        let s3;
 
-      it('returns the modified locale/en.txt file', (done) => {
-        agent
-          .get(`${eventRoot}/locale/en.txt`)
-          .expect((res) => {
-            assert.strictEqual(res.text, tooltip);
-          })
-          .expect(200, done);
+        before((done) => {
+          s3 = AWSMock.S3({
+            params: { Bucket: 'experiences' },
+          });
+
+          s3.putObject({ Key: 'locale/en.txt', Body: content }, () => {
+            done();
+          });
+        });
+        it('returns the modified locale/en.txt file', (done) => {
+          agent
+            .get(`${eventRoot}/locale/en.txt`)
+            .expect((res) => {
+              assert.strictEqual(res.text, tooltip);
+            })
+            .expect(200, done);
+        });
       });
     });
   });

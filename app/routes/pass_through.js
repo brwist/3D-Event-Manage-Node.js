@@ -22,11 +22,13 @@ module.exports = function(store) {
     };
     console.log(s3Client.getObject(config).promise);
     s3Client.getObject(config).promise().then(async (data) => {
-      const { client, event } = req.params
+      const { client, event } = req.params;
       let text = data.Body.toString();
       let tooltip = {}
-      const fetchTooltip = text.match(hotspotRegex).map(matchText => {
-        // matchText value has format hotspots.8
+      const matchedTexts = text.match(hotspotRegex)
+      if(!matchedTexts) { return text }
+      const fetchTooltip = matchedTexts.map(matchText => {
+        // matchText value has format hotspots.<value>
         // extract number from matchText
         const number = matchText.split('.')[1];
         return new Promise((resolve, reject)=> {
@@ -48,6 +50,8 @@ module.exports = function(store) {
           res.send(text)
         }
       });
+    }).catch(err => {
+      res.send(500);
     });
   });
 
