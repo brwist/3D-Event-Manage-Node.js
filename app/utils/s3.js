@@ -1,10 +1,5 @@
 const AWS = require('aws-sdk');
-
-const bucket = process.env.EXPERIENCE_BUCKET || 'experiences'
-const awsConfig = {
-  accessKeyId: process.env.EXPERIENCE_ACCESS_KEY_ID,
-  secretAccessKey: process.env.EXPERIENCE_SECRET_ACCESS_KEY,
-};
+const {awsConfig, bucket} = require('../configs/aws');
 
 AWS.config.update({...awsConfig});
 
