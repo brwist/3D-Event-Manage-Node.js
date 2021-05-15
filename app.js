@@ -107,24 +107,12 @@ app.use('/hotspots', authenticate, hotspots(store));
 app.get('/:client/:event/attendees', authenticateClientEvent, (req, res) => {
   const { client, event } = req.params;
   store.listAttendee(client, event, (err, attendees) => {
-    let content = '<ul>';
-    content += attendees.map(attendee => `<li>${attendee.name}</li>`).join('');
-    content += '<ul>';
-    res.locals = { content };
+    res.locals = { attendees };
     res.render('attendees');
   });
 });
 
 app.use('/:client/:event', authenticateClientEvent, passThrough());
-
-app.get('/redirect_page', (req, res) => {
-  const type = req.query.type;
-  res.locals = {
-    newPage: type === 'new_page',
-    link: '/hotspots',
-  };
-  res.render('redirect_link');
-});
 
 if (__filename === process.argv[1]) {
   const port = process.env.PORT || '5000';
