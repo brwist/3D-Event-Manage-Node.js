@@ -37,13 +37,6 @@ describe('App', () => {
     destination_url: destinationUrl,
     tooltip,
   };
-  const secondRedirect = {
-    client: attendee.client,
-    event: attendee.event,
-    source_path: 8,
-    destination_url: destinationUrl,
-    tooltip,
-  };
 
   let database;
   let storage;
@@ -52,7 +45,6 @@ describe('App', () => {
     database = redisMock.createClient();
     storage = createStorage({ database });
     storage.storeRedirect(redirect);
-    storage.storeRedirect(secondRedirect);
   });
 
   after(() => {
@@ -189,53 +181,6 @@ describe('App', () => {
             assert.strictEqual(res.text, content);
           })
           .expect(200, done);
-      });
-    });
-
-    context('pass through for /locale/en.txt', () => {
-      context('when tooltip not found in redis', () => {
-        const content = 'hotspots.1';
-        let s3;
-
-        before((done) => {
-          s3 = AWSMock.S3({
-            params: { Bucket: 'experiences' },
-          });
-
-          s3.putObject({ Key: 'locale/en.txt', Body: content }, () => {
-            done();
-          });
-        });
-        it('returns file as it is', (done) => {
-          agent
-            .get(`${eventRoot}/locale/en.txt`)
-            .expect((res) => {
-              assert.strictEqual(res.text, content);
-            })
-            .expect(200, done);
-        });
-      });
-      context('when tooltip found in redis', () => {
-        const content = 'hotspots.8';
-        let s3;
-
-        before((done) => {
-          s3 = AWSMock.S3({
-            params: { Bucket: 'experiences' },
-          });
-
-          s3.putObject({ Key: 'locale/en.txt', Body: content }, () => {
-            done();
-          });
-        });
-        it('returns the modified locale/en.txt file', (done) => {
-          agent
-            .get(`${eventRoot}/locale/en.txt`)
-            .expect((res) => {
-              assert.strictEqual(res.text, tooltip);
-            })
-            .expect(200, done);
-        });
       });
     });
   });
