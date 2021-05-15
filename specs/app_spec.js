@@ -17,7 +17,8 @@ const { app } = require('../app');
 describe('App', () => {
   const client = 'a_client';
   const event = 'an_event';
-  const sourcePath = '/hotspots/acd/efg.html';
+  const hotspotId = 'an_id';
+  const sourcePath = `/hotspots/${hotspotId}`;
   const destinationUrl = 'https://test.com';
 
   const email = 'pedro@pepito.com';
@@ -30,9 +31,9 @@ describe('App', () => {
   });
 
   const redirect = {
+    id: hotspotId,
     client: attendee.client,
     event: attendee.event,
-    source_path: sourcePath,
     destination_url: destinationUrl,
     tooltip,
   };
