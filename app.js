@@ -115,7 +115,7 @@ app.get('/:client/:event/attendees', authenticateClientEvent, (req, res) => {
   });
 });
 
-app.use('/:client/:event', authenticateClientEvent, passThrough());
+app.use('/:client/:event', authenticateClientEvent, passThrough(store));
 
 app.get('/redirect_page', (req, res) => {
   const type = req.query.type;
