@@ -10,6 +10,12 @@ const router = express.Router({mergeParams: true});
 const hotspotRegex = /hotspots\.(\d+)/g
 
 module.exports = function(store) {
+  router.get('/', async (req, res) => {
+    const { client, event } = req.params;
+    const room = await fetchDefaultRoom(store, client, event);
+    res.redirect(`/${client}/${event}/${room}/index.htm`);
+  });
+  
   router.get('/locale/en.txt', async (req, res) => {
     try {
       const s3Content = await downloadFromS3('locale/en.txt');
@@ -66,4 +72,14 @@ async function fetchToolTips(store, req, ids) {
   });
   await Promise.all(fetchTooltip);
   return tooltip;
+}
+
+function fetchDefaultRoom(store, client, event) {
+  const configKey = 'default_room'
+  return new Promise((resolve, reject) => {
+    // get event configuration from Redis
+    store.retrieveEventConfiguration(client, event, configKey, (defaultRoom) => {
+      resolve(defaultRoom);
+    });
+  });
 }

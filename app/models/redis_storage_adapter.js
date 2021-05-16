@@ -13,6 +13,10 @@ module.exports = function storage(options) {
     return `hotspot.${client}.${event}`;
   }
 
+  function computeEventConfigurationKey(client, event) {
+    return `configuration.${client}.${event}`;
+  }
+
   return {
     _database: options.database,
     storeRedirect(value) {
@@ -45,6 +49,17 @@ module.exports = function storage(options) {
         } else {
           callback(null, reply.map(attendee => Attendee.restore(attendee)));
         }
+      });
+    },
+    storeEventConfiguration(config) {
+      const key = computeEventConfigurationKey(config.client, config.event);
+      this._database.hset(key, config.eventKey, config.eventValue);
+    },
+    retrieveEventConfiguration(client, event, eventKey, callback) {
+      const key = computeEventConfigurationKey(client, event);
+      this._database.hget(key, eventKey, (err, reply) => {
+        debug('Event Configuration %s %s result: %o error: %o', key, eventKey, reply, err);
+        callback(reply);
       });
     },
   };

@@ -203,5 +203,22 @@ describe('App', () => {
           .expect(200, done);
       });
     });
+
+    context('pass through default room', () => {
+      const eventKey = 'default_room';
+      const eventValue = 'experience1';
+
+      before((done) => {
+        storage.storeEventConfiguration({ client, event, eventKey, eventValue });
+        done();
+      });
+
+      it('redirects to default room', (done) => {
+        agent
+          .get(`${eventRoot}`)
+          .expect('Location', `${eventRoot}/${eventValue}/index.htm`)
+          .expect(302, done);
+      });
+    });
   });
 });

@@ -116,4 +116,31 @@ describe('RedisStorage', () => {
       });
     });
   });
+
+  context('event configuration', () => {
+    const eventKey = 'default_room';
+    const eventValue = 'myExperience';
+    const eventConfig = {
+      client,
+      event,
+      eventKey,
+      eventValue,
+    };
+
+    it('stores event configuration', () => {
+      subject.storeEventConfiguration(eventConfig);
+
+      database.hget(`configuration.${client}.${event}`, eventKey, (err, value) => {
+        assert.strictEqual(eventValue, value);
+      });
+    });
+
+    it('fetches destination', () => {
+      subject.storeEventConfiguration(eventConfig);
+
+      subject.retrieveEventConfiguration(client, event, eventKey, (value) => {
+        assert.strictEqual(eventValue, value);
+      });
+    });
+  });
 });
