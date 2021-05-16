@@ -35,6 +35,10 @@ describe('App', () => {
     name: 'Pedro Pepito', client, event, email, password,
   });
 
+  const attendee2 = new Attendee({
+    name: 'User 2', client, event, email: 'user2@gmail.com', password,
+  });
+
   const redirect = {
     id: hotspotId,
     client: attendee.client,
@@ -102,6 +106,7 @@ describe('App', () => {
   describe('logging in', () => {
     before(() => {
       storage.storeAttendee(attendee);
+      storage.storeAttendee(attendee2);
     });
     describe('and event is not live', () => {
       it('returns 404 when logging in', (done) => {
@@ -162,9 +167,15 @@ describe('App', () => {
 
     context('attendees', () => {
       const attendeesUrl = `${eventRoot}/attendees`;
-      it('shows attendees page', (done) => {
+      it('shows logged in attendees', (done) => {
         agent
           .get(attendeesUrl)
+          .expect((res) => {
+            assert.strictEqual(true, res.text.includes('Pedro Pepito'));
+          })
+          .expect((res) => {
+            assert.strictEqual(false, res.text.includes('User 2'));
+          })
           .expect(200, done);
       });
     });
