@@ -18,6 +18,7 @@ describe('App', () => {
   const client = 'a_client';
   const event = 'an_event';
   const hotspotId = 'an_id';
+  const newPageHotSpotId = 'new_page_hotspot';
   const sourcePath = `/hotspots/${hotspotId}`;
   const destinationUrl = 'https://test.com';
 
@@ -38,6 +39,14 @@ describe('App', () => {
     tooltip,
   };
 
+  const newPageRedirect = {
+    id: newPageHotSpotId,
+    client: attendee.client,
+    event: attendee.event,
+    type: 'new_page',
+    destination_url: destinationUrl,
+  };
+
   let database;
   let storage;
 
@@ -45,6 +54,7 @@ describe('App', () => {
     database = redisMock.createClient();
     storage = createStorage({ database });
     storage.storeRedirect(redirect);
+    storage.storeRedirect(newPageRedirect);
   });
 
   after(() => {
@@ -151,6 +161,16 @@ describe('App', () => {
           .get(`${sourcePath}?v=123`)
           .expect('Location', destinationUrl)
           .expect(302, done);
+      });
+
+      it('renders an html page with destination_url when hotspot redirect type is new_page', (done) => {
+        const response = `<a href="${newPageRedirect.destination_url}" target="_blank">${newPageRedirect.destination_url}</a>`;
+        agent
+          .get(`${sourcePath}/new_page_hotspot`)
+          .expect((res) => {
+            assert.strictEqual(true, res.text.includes(response));
+          })
+          .expect(200, done);
       });
 
       it('returns 404', (done) => {
