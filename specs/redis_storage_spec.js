@@ -118,7 +118,7 @@ describe('RedisStorage', () => {
   });
 
   context('event configuration', () => {
-    const eventKey = 'default_room';
+    const eventKey = 'main_entrance';
     const eventValue = 'myExperience';
     const eventConfig = {
       client,

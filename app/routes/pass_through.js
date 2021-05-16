@@ -12,7 +12,7 @@ const hotspotRegex = /hotspots\.(\d+)/g
 module.exports = function(store) {
   router.get('/', async (req, res) => {
     const { client, event } = req.params;
-    const room = await fetchDefaultRoom(store, client, event);
+    const room = await fetchMainEntrance(store, client, event);
     res.redirect(`/${client}/${event}/${room}/index.htm`);
   });
 
@@ -74,8 +74,8 @@ async function fetchToolTips(store, req, ids) {
   return tooltip;
 }
 
-function fetchDefaultRoom(store, client, event) {
-  const configKey = 'default_room'
+function fetchMainEntrance(store, client, event) {
+  const configKey = 'main_entrance'
   return new Promise((resolve, reject) => {
     // get event configuration from Redis
     store.retrieveEventConfiguration(client, event, configKey, (defaultRoom) => {

@@ -204,8 +204,8 @@ describe('App', () => {
       });
     });
 
-    context('pass through default room', () => {
-      const eventKey = 'default_room';
+    context('pass through main entrance', () => {
+      const eventKey = 'main_entrance';
       const eventValue = 'experience1';
 
       before((done) => {
