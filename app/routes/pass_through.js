@@ -15,7 +15,7 @@ module.exports = function(store) {
     const room = await fetchDefaultRoom(store, client, event);
     res.redirect(`/${client}/${event}/${room}/index.htm`);
   });
-  
+
   router.get('/locale/en.txt', async (req, res) => {
     try {
       const s3Content = await downloadFromS3('locale/en.txt');
