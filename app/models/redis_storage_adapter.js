@@ -14,7 +14,7 @@ module.exports = function storage(options) {
   }
 
   function computeEventConfigurationKey(client, event) {
-    return `configuration.${client}.${event}`;
+    return `event.${client}.${event}`;
   }
 
   return {

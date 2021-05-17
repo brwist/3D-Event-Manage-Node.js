@@ -130,7 +130,7 @@ describe('RedisStorage', () => {
     it('stores event configuration', () => {
       subject.storeEventConfiguration(eventConfig);
 
-      database.hget(`configuration.${client}.${event}`, eventKey, (err, value) => {
+      database.hget(`event.${client}.${event}`, eventKey, (err, value) => {
         assert.strictEqual(eventValue, value);
       });
     });
