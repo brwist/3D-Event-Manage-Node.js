@@ -3,6 +3,7 @@ const s3Proxy = require('s3-proxy');
 const AWS = require('aws-sdk');
 const { downloadFromS3 } = require('../utils/s3');
 const { awsConfig, bucket } = require('../configs/aws');
+const { fetchEventConfig } = require('../utils/helpers')
 
 AWS.config.update({...awsConfig});
 
@@ -74,12 +75,8 @@ async function fetchToolTips(store, req, ids) {
   return tooltip;
 }
 
-function fetchMainEntrance(store, client, event) {
+async function fetchMainEntrance(store, client, event) {
   const configKey = 'main_entrance'
-  return new Promise((resolve, reject) => {
-    // get event configuration from Redis
-    store.retrieveEventConfiguration(client, event, configKey, (defaultRoom) => {
-      resolve(defaultRoom);
-    });
-  });
+  const mainEntrance = await fetchEventConfig(store, client, event, configKey);
+  return mainEntrance;
 }
