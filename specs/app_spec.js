@@ -26,6 +26,10 @@ describe('App', () => {
   const password = 'caliente';
   const tooltip = 'Living room';
   const eventRoot = `/${client}/${event}`;
+  const solarDay = 24 * 60 * 60 * 1000;
+  const now = new Date().getTime();
+  const tomorrow = now + solarDay;
+  const yesterday = now - solarDay;
 
   const attendee = new Attendee({
     name: 'Pedro Pepito', client, event, email, password,
@@ -99,32 +103,47 @@ describe('App', () => {
     before(() => {
       storage.storeAttendee(attendee);
     });
-
-    it('redirect to experience', (done) => {
-      request(app)
-        .post(`${eventRoot}/login`)
-        .type('form')
-        .send({ username: attendee.email, password })
-        .expect('Location', eventRoot)
-        .expect(302, done);
+    describe('and event is not live', () => {
+      it('returns 404 when logging in', (done) => {
+        request(app)
+          .post(`${eventRoot}/login`)
+          .type('form')
+          .send({ username: attendee.email, password })
+          .expect(404, done);
+      });
     });
+    describe('and event is live', () => {
+      before(() => {
+        storage.storeAttendee(attendee);
+        storage.storeEventConfiguration({ client, event, eventKey: 'start_time', eventValue: yesterday });
+        storage.storeEventConfiguration({ client, event, eventKey: 'end_time', eventValue: tomorrow });
+      });
+      it('redirect to experience', (done) => {
+        request(app)
+          .post(`${eventRoot}/login`)
+          .type('form')
+          .send({ username: attendee.email, password })
+          .expect('Location', eventRoot)
+          .expect(302, done);
+      });
 
-    it('redirect to login on failure', (done) => {
-      request(app)
-        .post(`${eventRoot}/login`)
-        .type('form')
-        .send({ username: attendee.email, password: 'not the right password' })
-        .expect('Location', `${eventRoot}/login`)
-        .expect(302, done);
-    });
+      it('redirect to login on failure', (done) => {
+        request(app)
+          .post(`${eventRoot}/login`)
+          .type('form')
+          .send({ username: attendee.email, password: 'not the right password' })
+          .expect('Location', `${eventRoot}/login`)
+          .expect(302, done);
+      });
 
-    it('redirect to login on user not found', (done) => {
-      request(app)
-        .post(`${eventRoot}/login`)
-        .type('form')
-        .send({ username: 'who@what.where', password: 'not the right password' })
-        .expect('Location', `${eventRoot}/login`)
-        .expect(302, done);
+      it('redirect to login on user not found', (done) => {
+        request(app)
+          .post(`${eventRoot}/login`)
+          .type('form')
+          .send({ username: 'who@what.where', password: 'not the right password' })
+          .expect('Location', `${eventRoot}/login`)
+          .expect(302, done);
+      });
     });
   });
 
@@ -132,6 +151,8 @@ describe('App', () => {
     let agent;
 
     before((done) => {
+      storage.storeEventConfiguration({ client, event, eventKey: 'start_time', eventValue: yesterday });
+      storage.storeEventConfiguration({ client, event, eventKey: 'end_time', eventValue: tomorrow });
       agent = request.agent(app);
       agent
         .post(`${eventRoot}/login`)

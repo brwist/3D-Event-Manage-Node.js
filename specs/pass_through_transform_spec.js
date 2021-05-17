@@ -26,6 +26,11 @@ describe('App', () => {
   const eventRoot = `/${client}/${event}`;
   const fixurePath = path.join(__dirname, 'fixures/');
 
+  const solarDay = 24 * 60 * 60 * 1000;
+  const now = new Date().getTime();
+  const tomorrow = now + solarDay;
+  const yesterday = now - solarDay;
+
   const attendee = new Attendee({
     name: 'Pedro Pepito', client, event, email, password,
   });
@@ -63,6 +68,8 @@ describe('App', () => {
     storage.storeRedirect(secondRedirect);
     storage.storeRedirect(thirdRedirect);
     storage.storeAttendee(attendee);
+    storage.storeEventConfiguration({ client, event, eventKey: 'start_time', eventValue: yesterday });
+    storage.storeEventConfiguration({ client, event, eventKey: 'end_time', eventValue: tomorrow });
   });
 
   after(() => {

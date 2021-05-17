@@ -13,6 +13,7 @@ const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
 const { authenticate, authenticateClientEvent } = require('./app/middlewares/authenticate');
 const { redirectToLogin } = require('./app/utils/redirect');
+const { isEventLive } = require('./app/utils/helpers');
 
 const privateKey = process.env.SESSION_KEY;
 
@@ -87,14 +88,20 @@ app.get('/:client/:event/login', (req, res) => {
 });
 
 app.post('/:client/:event/login',
-  (req, res, next) => {
+  async (req, res, next) => {
+    const { client, event } = req.params;
+    const eventLive = await isEventLive(store, client, event);
+    // if event is not live then send 404
+    if (!eventLive) {
+      res.sendStatus(404).end();
+      return;
+    }
     passport.authenticate('local', (err, user) => {
       if (err || !user) {
         redirectToLogin(req, res);
       } else {
         req.logIn(user, (loginErr) => {
           if (loginErr) { throw loginErr; }
-          const { client, event } = req.params;
 
           res.redirect(`/${client}/${event}`);
         });
