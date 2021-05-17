@@ -112,18 +112,12 @@ app.post('/:client/:event/login',
 app.use('/hotspots', authenticate, hotspots(store));
 
 app.get('/:client/:event/attendees', authenticateClientEvent, (req, res) => {
-  const { client, event } = req.params;
-  store.listAttendee(client, event, (err, attendees) => {
-    if (err) {
-      res.send(500);
-    }
-    const loggedInUsers = Object.values(req.sessionStore.sessions)
-      .map(sessionsStore => JSON.parse(sessionsStore))
-      .map(parsedSession => JSON.parse(parsedSession.passport.user))
-      .map(user => user.email);
-    res.locals = { attendees: attendees.filter(attendee => loggedInUsers.includes(attendee.email)) };
-    res.render('attendees');
-  });
+  const attendees = Object.values(req.sessionStore.sessions)
+    .map(sessionsStore => JSON.parse(sessionsStore))
+    .map(parsedSession => JSON.parse(parsedSession.passport.user))
+    .map(user => user.name);
+  res.locals = { attendees };
+  res.render('attendees');
 });
 
 app.use('/:client/:event', authenticateClientEvent, passThrough(store));
