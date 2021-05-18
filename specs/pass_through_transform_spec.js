@@ -19,7 +19,6 @@ const { app } = require('../app');
 describe('App', () => {
   const client = 'a_client';
   const event = 'an_event';
-  const destinationUrl = 'https://test.com';
 
   const email = 'pedro1@pepito.com';
   const password = 'caliente';
@@ -35,27 +34,24 @@ describe('App', () => {
     name: 'Pedro Pepito', client, event, email, password,
   });
 
-  const redirect = {
+  const label = {
     id: 9,
     client: attendee.client,
     event: attendee.event,
-    destination_url: destinationUrl,
-    tooltip: 'Kitchen',
+    text: 'Kitchen',
   };
-  const secondRedirect = {
+  const secondLabel = {
     id: 10,
     client: attendee.client,
     event: attendee.event,
-    destination_url: destinationUrl,
-    tooltip: 'Living room',
+    text: 'Living room',
   };
 
-  const thirdRedirect = {
+  const thirdLabel = {
     id: 11,
     client: attendee.client,
     event: attendee.event,
-    destination_url: destinationUrl,
-    tooltip: 'Bed room',
+    text: 'Bed room',
   };
 
   let database;
@@ -64,9 +60,9 @@ describe('App', () => {
   before(() => {
     database = redisMock.createClient();
     storage = createStorage({ database });
-    storage.storeRedirect(redirect);
-    storage.storeRedirect(secondRedirect);
-    storage.storeRedirect(thirdRedirect);
+    storage.storeLabel(label);
+    storage.storeLabel(secondLabel);
+    storage.storeLabel(thirdLabel);
     storage.storeAttendee(attendee);
     storage.storeEventConfiguration({ client, event, eventKey: 'start_time', eventValue: yesterday });
     storage.storeEventConfiguration({ client, event, eventKey: 'end_time', eventValue: tomorrow });

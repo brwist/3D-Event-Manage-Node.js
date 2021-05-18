@@ -24,7 +24,6 @@ describe('App', () => {
 
   const email = 'pedro@pepito.com';
   const password = 'caliente';
-  const tooltip = 'Living room';
   const eventRoot = `/${client}/${event}`;
   const solarDay = 24 * 60 * 60 * 1000;
   const now = new Date().getTime();
@@ -57,7 +56,6 @@ describe('App', () => {
     client: attendee.client,
     event: attendee.event,
     destination_url: destinationUrl,
-    tooltip,
   };
 
   const newPageRedirect = {

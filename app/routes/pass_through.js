@@ -70,13 +70,13 @@ async function fetchToolTips(store, req, ids) {
   const fetchTooltip = ids.map(id => {
     return new Promise((resolve, reject)=> {
       // get tooltip value from Redis
-      store.retrieveRedirect(client, event, id, (response) => {
+      store.retrieveLabel(client, event, id, (response) => {
         resolve(response);
       });
-    }).then((redirect) => {
+    }).then((label) => {
       // cache tooltip
-      if(redirect && redirect.tooltip) {
-        tooltip[id] = redirect.tooltip;
+      if(label && label.text) {
+        tooltip[id] = label.text;
       }
     })
   });

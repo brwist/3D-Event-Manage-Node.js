@@ -21,6 +21,34 @@ describe('RedisStorage', () => {
     database.flushall();
   });
 
+  context('label', () => {
+    const labelId = 'an_id';
+    const text = 'tooltip1';
+
+    const label = {
+      id: labelId,
+      client,
+      event,
+      text,
+    };
+
+    it('stores label for an event', () => {
+      subject.storeLabel(label);
+
+      database.hget(`label.${client}.${event}`, labelId, (err, rawLabel) => {
+        assert.strictEqual(unMarshall(rawLabel).text, text);
+      });
+    });
+
+    it('fetches label', () => {
+      subject.storeLabel(label);
+
+      subject.retrieveLabel(client, event, labelId, (result) => {
+        assert.strictEqual(result.text, label.text);
+      });
+    });
+  });
+
   context('redirect', () => {
     const hotspotId = 'an_id';
     const destinationUrl = 'https://test.com';

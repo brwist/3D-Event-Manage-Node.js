@@ -9,6 +9,10 @@ module.exports = function storage(options) {
     return `attendee.${client}.${event}`;
   }
 
+  function computeLabelKey(client, event) {
+    return `label.${client}.${event}`;
+  }
+
   function computeHotspotKey(client, event) {
     return `hotspot.${client}.${event}`;
   }
@@ -19,6 +23,16 @@ module.exports = function storage(options) {
 
   return {
     _database: options.database,
+    storeLabel(value) {
+      const content = marshall({ text: value.text });
+      this._database.hset(computeLabelKey(value.client, value.event), value.id, content);
+    },
+    retrieveLabel(client, event, labelId, callback) {
+      const key = computeLabelKey(client, event);
+      this._database.hget(key, labelId, (err, reply) => {
+        callback(unMarshall(reply));
+      });
+    },
     storeRedirect(value) {
       const content = marshall({ destination_url: value.destination_url, tooltip: value.tooltip, type: value.type });
       this._database.hset(computeHotspotKey(value.client, value.event), value.id, content);
