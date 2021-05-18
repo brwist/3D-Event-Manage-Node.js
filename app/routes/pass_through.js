@@ -32,10 +32,10 @@ module.exports = function(store) {
         }
       });
     } catch(error) {
-      if(err.code === 'NoSuchKey') {
-        err = NotFoundError('Could not retrieve the file you were looking for.');
+      if(error.code === 'NoSuchKey') {
+        error = NotFoundError('Could not retrieve the file you were looking for.');
       }
-      throw(err);
+      throw(error);
     }
   });
 
