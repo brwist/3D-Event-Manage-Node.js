@@ -5,6 +5,7 @@ const { downloadFromS3 } = require('../utils/s3');
 const { awsConfig, bucket } = require('../configs/aws');
 const { fetchEventConfig } = require('../utils/helpers');
 const { NotFoundError } = require('../utils/errors');
+const debug = require('debug')('redis-storage-adapter');
 
 AWS.config.update({...awsConfig});
 
@@ -14,13 +15,15 @@ const hotspotRegex = /hotspots\.(\d+)/g
 module.exports = function(store) {
   router.get('/', async (req, res) => {
     const { client, event } = req.params;
-    const room = await fetchMainEntrance(store, client, event);
-    res.redirect(`/${client}/${event}/${room}/index.htm`);
+    const experience = await fetchMainEntrance(store, client, event);
+    res.redirect(`/${client}/${event}/${experience}/index.htm`);
   });
 
-  router.get('/locale/en.txt', async (req, res) => {
+  router.get('/:experience/locale/en.txt', async (req, res) => {
+    debug('Processing en.txt...');
     try {
-      const s3Content = await downloadFromS3('locale/en.txt');
+      const experience = req.params.experience;
+      const s3Content = await downloadFromS3(`${experience}/locale/en.txt`);
       const text = s3Content.data.toString();
       const transformedText = await transformHotspotsToTooltip(text, req, store);
       res.format({
@@ -30,10 +33,9 @@ module.exports = function(store) {
       });
     } catch(error) {
       if(err.code === 'NoSuchKey') {
-        throw new NotFoundError('Could not retrieve the file you were looking for.');
-      } else {
-        throw(err);
+        err = NotFoundError('Could not retrieve the file you were looking for.');
       }
+      throw(err);
     }
   });
 
@@ -51,6 +53,8 @@ module.exports = function(store) {
 
 async function transformHotspotsToTooltip(text, req, store) {
   const matchedTexts = text.match(hotspotRegex);
+  debug('Matched Texts %o', matchedTexts);
+
   if(!matchedTexts) { return text }
 
   const ids = matchedTexts.map(matchText => matchText.split('.')[1]);

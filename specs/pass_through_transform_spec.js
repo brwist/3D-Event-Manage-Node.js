@@ -98,13 +98,13 @@ describe('App', () => {
             params: { Bucket: 'experiences' },
           });
 
-          s3.putObject({ Key: 'locale/en.txt', Body: content.toString() }, () => {
+          s3.putObject({ Key: 'a_room/locale/en.txt', Body: content.toString() }, () => {
             done();
           });
         });
         it('returns file as it is', (done) => {
           agent
-            .get(`${eventRoot}/locale/en.txt`)
+            .get(`${eventRoot}/a_room/locale/en.txt`)
             .expect((res) => {
               assert.strictEqual(res.text, content.toString());
             })
@@ -120,13 +120,13 @@ describe('App', () => {
             params: { Bucket: 'experiences' },
           });
 
-          s3.putObject({ Key: 'locale/en.txt', Body: content.toString() }, () => {
+          s3.putObject({ Key: 'a_room/locale/en.txt', Body: content.toString() }, () => {
             done();
           });
         });
         it('returns the modified locale/en.txt file', (done) => {
           agent
-            .get(`${eventRoot}/locale/en.txt`)
+            .get(`${eventRoot}/a_room/locale/en.txt`)
             .expect((res) => {
               assert.strictEqual(res.text, content.toString().replace('hotspots.10', 'Living room'));
             })
@@ -142,13 +142,13 @@ describe('App', () => {
             params: { Bucket: 'experiences' },
           });
 
-          s3.putObject({ Key: 'locale/en.txt', Body: content.toString() }, () => {
+          s3.putObject({ Key: 'a_room/locale/en.txt', Body: content.toString() }, () => {
             done();
           });
         });
         it('returns the modified locale/en.txt file', (done) => {
           agent
-            .get(`${eventRoot}/locale/en.txt`)
+            .get(`${eventRoot}/a_room/locale/en.txt`)
             .expect((res) => {
               const expectedText = content.toString()
                 .replace('hotspots.10', 'Living room')
