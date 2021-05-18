@@ -14,7 +14,7 @@ function fetchEventConfig(store, client, event, configKey) {
     store.retrieveEventConfiguration(client, event, configKey, (value) => {
       resolve(value);
     });
-  })
+  });
 }
 
 module.exports = {

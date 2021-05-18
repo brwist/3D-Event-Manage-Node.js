@@ -30,6 +30,19 @@ describe('App', () => {
   const now = new Date().getTime();
   const tomorrow = now + solarDay;
   const yesterday = now - solarDay;
+  const page404 = `<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>Oops!</h1>
+<p>We could not find what you were looking for.</p>
+
+  </body>
+</html>
+`;
 
   const attendee = new Attendee({
     name: 'Pedro Pepito', client, event, email, password,
@@ -114,6 +127,9 @@ describe('App', () => {
           .post(`${eventRoot}/login`)
           .type('form')
           .send({ username: attendee.email, password })
+          .expect((res) => {
+            assert.strictEqual(res.text, page404);
+          })
           .expect(404, done);
       });
     });
@@ -152,7 +168,7 @@ describe('App', () => {
     });
   });
 
-  context('logged in', () => {
+  describe('logged in', () => {
     let agent;
 
     before((done) => {
@@ -208,6 +224,9 @@ describe('App', () => {
       it('returns 404', (done) => {
         agent
           .get('/hotspots/notfound')
+          .expect((res) => {
+            assert.strictEqual(res.text, page404);
+          })
           .expect(404, done);
       });
     });

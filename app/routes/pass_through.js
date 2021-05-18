@@ -3,7 +3,8 @@ const s3Proxy = require('s3-proxy');
 const AWS = require('aws-sdk');
 const { downloadFromS3 } = require('../utils/s3');
 const { awsConfig, bucket } = require('../configs/aws');
-const { fetchEventConfig } = require('../utils/helpers')
+const { fetchEventConfig } = require('../utils/helpers');
+const { NotFoundError } = require('../utils/errors');
 
 AWS.config.update({...awsConfig});
 
@@ -28,7 +29,11 @@ module.exports = function(store) {
         }
       });
     } catch(error) {
-      res.sendStatus(500);
+      if(err.code === 'NoSuchKey') {
+        throw new NotFoundError('Could not retrieve the file you were looking for.');
+      } else {
+        throw(err);
+      }
     }
   });
 

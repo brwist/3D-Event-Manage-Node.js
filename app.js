@@ -14,6 +14,7 @@ const createStorage = require('./app/models/redis_storage_adapter');
 const { authenticate, authenticateClientEvent } = require('./app/middlewares/authenticate');
 const { redirectToLogin } = require('./app/utils/redirect');
 const { isEventLive } = require('./app/utils/helpers');
+const { NotFoundError } = require('./app/utils/errors');
 const handleErrors = require('./app/middlewares/error');
 
 
@@ -92,23 +93,26 @@ app.get('/:client/:event/login', (req, res) => {
 app.post('/:client/:event/login',
   async (req, res, next) => {
     const { client, event } = req.params;
-    const eventLive = await isEventLive(store, client, event);
-    // if event is not live then send 404
-    if (!eventLive) {
-      res.sendStatus(404).end();
-      return;
-    }
-    passport.authenticate('local', (err, user) => {
-      if (err || !user) {
-        redirectToLogin(req, res);
-      } else {
-        req.logIn(user, (loginErr) => {
-          if (loginErr) { throw loginErr; }
-
-          res.redirect(`/${client}/${event}`);
-        });
+    try {
+      const eventLive = await isEventLive(store, client, event);
+      // if event is not live then send NotFoundError
+      if (!eventLive) {
+        throw new NotFoundError('Event has not started or has finished.');
       }
-    })(req, res, next);
+      passport.authenticate('local', (err, user) => {
+        if (err || !user) {
+          redirectToLogin(req, res);
+        } else {
+          req.logIn(user, (loginErr) => {
+            if (loginErr) { throw loginErr; }
+
+            res.redirect(`/${client}/${event}`);
+          });
+        }
+      })(req, res, next);
+    } catch (err) {
+      next(err);
+    }
   });
 
 app.use('/hotspots', authenticate, hotspots(store));

@@ -1,31 +1,39 @@
 const express = require('express');
 const url = require('url');
+const { NotFoundError } = require('../utils/errors');
 
 const router = express.Router();
 
 module.exports = function(store) {
-  function retrieveRedirect(res, attendee, originalUrl) {
+  function retrieveRedirect(attendee, originalUrl) {
     const path = url.parse(originalUrl).pathname;
     const key = path.substring(path.lastIndexOf('/') + 1);
 
-    store.retrieveRedirect(attendee.client, attendee.event, key, (redirect) => {
-      if(redirect && redirect.destination_url) {
-        if(redirect.type === 'new_page') {
-          res.locals = {
-            destination_url: redirect.destination_url
-          }
-          res.render('hotspots_redirect')
+    return new Promise((resolve, reject) => {
+      store.retrieveRedirect(attendee.client, attendee.event, key, (redirect) => {
+        if(redirect && redirect.destination_url) {
+          resolve(redirect)
         } else {
-          res.redirect(redirect.destination_url);
+          reject(new NotFoundError('Hotspot not found.'))
         }
-      } else {
-        res.status(404).end();
-      }
+      });
     });
   }
 
-  router.get('*', (req, res) => {
-    retrieveRedirect(res, req.user, req.originalUrl);
+  router.get('*', async (req, res, next) => {
+    try {
+      const redirect = await retrieveRedirect(req.user, req.originalUrl);
+      if(redirect.type === 'new_page') {
+        res.locals = {
+          destination_url: redirect.destination_url
+        }
+        res.render('hotspots_redirect')
+      } else {
+        res.redirect(redirect.destination_url);
+      }
+    } catch(err){
+      next(err);
+    }
   });
 
   return router;
