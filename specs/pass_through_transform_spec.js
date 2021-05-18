@@ -124,7 +124,7 @@ describe('App', () => {
           agent
             .get(`${eventRoot}/a_room/locale/en.txt`)
             .expect((res) => {
-              assert.strictEqual(res.text, content.toString().replace('hotspots.10', 'Living room'));
+              assert.strictEqual(res.text, content.toString().replace('labels.10', 'Living room'));
             })
             .expect(200, done);
         });
@@ -147,9 +147,9 @@ describe('App', () => {
             .get(`${eventRoot}/a_room/locale/en.txt`)
             .expect((res) => {
               const expectedText = content.toString()
-                .replace('hotspots.10', 'Living room')
-                .replace('hotspots.10', 'Living room')
-                .replace('hotspots.11', 'Bed room');
+                .replace('labels.10', 'Living room')
+                .replace('labels.10', 'Living room')
+                .replace('labels.11', 'Bed room');
               assert.strictEqual(res.text, expectedText);
             })
             .expect(200, done);

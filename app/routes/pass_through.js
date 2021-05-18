@@ -10,7 +10,7 @@ const debug = require('debug')('redis-storage-adapter');
 AWS.config.update({...awsConfig});
 
 const router = express.Router({mergeParams: true});
-const hotspotRegex = /hotspots\.(\d+)/g
+const hotspotRegex = /labels\.(\d+)/g
 
 module.exports = function(store) {
   router.get('/', async (req, res) => {
