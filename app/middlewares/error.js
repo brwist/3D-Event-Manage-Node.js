@@ -18,7 +18,7 @@ const handleErrors = (error, req, res, next) => {
     page = '404';
   } else {
     res.local = {
-      message: err.message || 'Something went wrong',
+      message: error.message || 'Something went wrong',
       error
     }
     page = 'error';
