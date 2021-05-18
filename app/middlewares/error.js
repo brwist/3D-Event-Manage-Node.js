@@ -23,7 +23,7 @@ const handleErrors = (error, req, res, next) => {
     }
     page = 'error';
   }
-  return res.status(httpStatus).render(page);
+  return res.status(httpStatus).type('html').render(page);
 }
 
 module.exports = handleErrors;
