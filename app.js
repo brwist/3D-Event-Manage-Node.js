@@ -14,6 +14,8 @@ const createStorage = require('./app/models/redis_storage_adapter');
 const { authenticate, authenticateClientEvent } = require('./app/middlewares/authenticate');
 const { redirectToLogin } = require('./app/utils/redirect');
 const { isEventLive } = require('./app/utils/helpers');
+const handleErrors = require('./app/middlewares/error');
+
 
 const privateKey = process.env.SESSION_KEY;
 
@@ -121,6 +123,8 @@ app.get('/:client/:event/attendees', authenticateClientEvent, (req, res) => {
 });
 
 app.use('/:client/:event', authenticateClientEvent, passThrough(store));
+
+app.use(handleErrors);
 
 if (__filename === process.argv[1]) {
   const port = process.env.PORT || '5000';
