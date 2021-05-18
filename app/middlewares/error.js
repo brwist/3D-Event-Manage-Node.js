@@ -1,6 +1,19 @@
+const { GeneralError } = require('../utils/errors');
+
 const handleErrors = (error, req, res, next) => {
-  const httpStatus = error.status || error.getCode() || 500;
+  let httpStatus;
   let page;
+
+  // set value of httpStatus
+  if(error.status) {
+    httpStatus = error.status;
+  } else if (error instanceof GeneralError) {
+    httpStatus = error.getCode();
+  } else {
+    httpStatus = 500;
+  }
+
+  // set page to render
   if(httpStatus === 404) {
     page = '404';
   } else {
@@ -8,7 +21,7 @@ const handleErrors = (error, req, res, next) => {
       message: err.message || 'Something went wrong',
       error
     }
-    page = 'error'
+    page = 'error';
   }
   return res.status(httpStatus).render(page);
 }
