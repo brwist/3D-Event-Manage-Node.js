@@ -5,13 +5,12 @@ const handleErrors = (error, req, res, next) => {
     page = '404';
   } else {
     res.local = {
-      message: err.message,
+      message: err.message || 'Something went wrong',
       error
     }
     page = 'error'
   }
-  return res.render(httpStatus).render(page);
+  return res.status(httpStatus).render(page);
 }
-
 
 module.exports = handleErrors;
