@@ -14,6 +14,7 @@ module.exports = function(store) {
   router.get('/', async (req, res) => {
     const { client, event } = req.params;
     const experience = await fetchMainEntrance(store, client, event);
+    debug('Loading main entrance %o', experience);
     res.redirect(`/${client}/${event}/${experience}/index.htm`);
   });
 
