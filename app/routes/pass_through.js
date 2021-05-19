@@ -1,13 +1,11 @@
 const express = require('express');
 const s3Proxy = require('s3-proxy');
-const AWS = require('aws-sdk');
 const { downloadFromS3 } = require('../utils/s3');
-const { awsConfig, bucket } = require('../configs/aws');
 const { fetchEventConfig } = require('../utils/helpers');
 const { NotFoundError } = require('../utils/errors');
 const debug = require('debug')('redis-storage-adapter');
-
-AWS.config.update({...awsConfig});
+const experienceBucket = require('../lib/buckets/experience');
+const { experienceBucket: experienceBucketConfig } = require('../configs/aws');
 
 const router = express.Router({mergeParams: true});
 const hotspotRegex = /labels\.(\d+)/g
@@ -23,7 +21,9 @@ module.exports = function(store) {
     debug('Processing en.txt...');
     try {
       const experience = req.params.experience;
-      const s3Content = await downloadFromS3(`${experience}/locale/en.txt`);
+      const s3BucketName = experienceBucketConfig.bucket;
+      const s3KeyName = `${experience}/locale/en.txt`;
+      const s3Content = await downloadFromS3(experienceBucket, s3BucketName, s3KeyName);
       const text = s3Content.data.toString();
       const transformedText = await transformHotspotsToTooltip(text, req, store);
       res.format({
@@ -40,6 +40,8 @@ module.exports = function(store) {
   });
 
   router.get('*', (req, res, next) => {
+    const bucket = experienceBucketConfig.bucket;
+    const awsConfig = experienceBucketConfig.awsConfig;
     s3Proxy({
      ...awsConfig,
       bucket,

@@ -1,11 +1,4 @@
-const AWS = require('aws-sdk');
-const {awsConfig, bucket} = require('../configs/aws');
-
-AWS.config.update({...awsConfig});
-
-const s3Client = new AWS.S3();
-
-async function downloadFromS3(key) {
+async function downloadFromS3(s3Client, bucket, key) {
   const config = { Bucket: bucket, Key: key }
   const file = await s3Client.getObject(config).promise()
   return {
