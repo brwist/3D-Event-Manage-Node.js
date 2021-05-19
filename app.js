@@ -80,6 +80,7 @@ environmentFactory.setupSession(redisClient);
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(express.static(`${__dirname}/app/public`));
 app.set('views', `${__dirname}/app/views`);
 app.set('view engine', 'hbs');
 
