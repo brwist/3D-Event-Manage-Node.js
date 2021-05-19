@@ -17,7 +17,6 @@ const { isEventLive } = require('./app/utils/helpers');
 const { NotFoundError } = require('./app/utils/errors');
 const handleErrors = require('./app/middlewares/error');
 
-
 const privateKey = process.env.SESSION_KEY;
 
 function environment(app) {
@@ -30,7 +29,8 @@ function environment(app) {
         secret: privateKey,
         resave: true,
         saveUninitialized: false,
-        cookie: { secure: true },
+        rolling: true,
+        cookie: { secure: true, maxAge: 3600000 },
       }));
     },
   };
