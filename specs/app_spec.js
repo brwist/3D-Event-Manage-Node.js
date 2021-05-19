@@ -18,6 +18,7 @@ describe('App', () => {
   const client = 'a_client';
   const event = 'an_event';
   const hotspotId = 'an_id';
+  const presignHotSpotId = 'presign_hotspot';
   const newPageHotSpotId = 'new_page_hotspot';
   const sourcePath = `/hotspots/${hotspotId}`;
   const destinationUrl = 'https://test.com';
@@ -56,6 +57,7 @@ describe('App', () => {
     client: attendee.client,
     event: attendee.event,
     destination_url: destinationUrl,
+    presign: false,
   };
 
   const newPageRedirect = {
@@ -64,6 +66,15 @@ describe('App', () => {
     event: attendee.event,
     type: 'new_page',
     destination_url: destinationUrl,
+    presign: false,
+  };
+
+  const preSignRedirect = {
+    id: presignHotSpotId,
+    client: attendee.client,
+    event: attendee.event,
+    destination_url: 'folder1/my_file.txt',
+    presign: true,
   };
 
   let database;
@@ -195,37 +206,59 @@ describe('App', () => {
     });
 
     context('hotspots', () => {
-      it('redirects to hotspot path', (done) => {
-        agent
-          .get(sourcePath)
-          .expect('Location', destinationUrl)
-          .expect(302, done);
-      });
+      context('when hotspot has presign set true', () => {
+        before((done) => {
+          storage.storeRedirect(preSignRedirect);
+          const s3 = AWSMock.S3({
+            params: { Bucket: 'contents' },
+          });
 
-      it('redirects to hotspot path when parameters are present', (done) => {
-        agent
-          .get(`${sourcePath}?v=123`)
-          .expect('Location', destinationUrl)
-          .expect(302, done);
+          s3.putObject({ Key: preSignRedirect.destination_url, Body: 'content' }, () => {
+            done();
+          });
+        });
+        it('generates presigned url and renders page with given link', (done) => {
+          agent
+            .get(`/hotspots/${presignHotSpotId}`)
+            .expect((res) => {
+              assert.strictEqual(true, res.text.includes('Your file is here'));
+            })
+            .expect(200, done);
+        });
       });
+      context('when hotspot has presigned set falsy value', () => {
+        it('redirects to hotspot path', (done) => {
+          agent
+            .get(sourcePath)
+            .expect('Location', destinationUrl)
+            .expect(302, done);
+        });
 
-      it('renders an html page with destination_url when hotspot redirect type is new_page', (done) => {
-        const response = `<a href="${newPageRedirect.destination_url}" target="_blank">${newPageRedirect.destination_url}</a>`;
-        agent
-          .get(`${sourcePath}/new_page_hotspot`)
-          .expect((res) => {
-            assert.strictEqual(true, res.text.includes(response));
-          })
-          .expect(200, done);
-      });
+        it('redirects to hotspot path when parameters are present', (done) => {
+          agent
+            .get(`${sourcePath}?v=123`)
+            .expect('Location', destinationUrl)
+            .expect(302, done);
+        });
 
-      it('returns 404', (done) => {
-        agent
-          .get('/hotspots/notfound')
-          .expect((res) => {
-            assert.strictEqual(res.text, page404);
-          })
-          .expect(404, done);
+        it('renders an html page with destination_url when hotspot redirect type is new_page', (done) => {
+          const response = `<a href="${newPageRedirect.destination_url}" target="_blank">${newPageRedirect.destination_url}</a>`;
+          agent
+            .get(`${sourcePath}/new_page_hotspot`)
+            .expect((res) => {
+              assert.strictEqual(true, res.text.includes(response));
+            })
+            .expect(200, done);
+        });
+
+        it('returns 404', (done) => {
+          agent
+            .get('/hotspots/notfound')
+            .expect((res) => {
+              assert.strictEqual(res.text, page404);
+            })
+            .expect(404, done);
+        });
       });
     });
 

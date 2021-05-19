@@ -1,6 +1,9 @@
 const express = require('express');
 const url = require('url');
 const { NotFoundError } = require('../utils/errors');
+const contentBucket = require('../lib/buckets/content');
+const { generatePresignedUrl } = require('../utils/s3');
+const { contentBucket: contentBucketConfig } = require('../configs/aws');
 
 const router = express.Router();
 
@@ -23,13 +26,23 @@ module.exports = function(store) {
   router.get('*', async (req, res, next) => {
     try {
       const redirect = await retrieveRedirect(req.user, req.originalUrl);
+      if(redirect.presign) {
+        const bucketName = contentBucketConfig.bucket;
+        const key = redirect.destination_url;
+        const duration = 15 * 60; // Signed url expires in 15 minutes
+        const destination_url = generatePresignedUrl(contentBucket, bucketName, key, duration);
+        res.locals = {
+          destination_url: destination_url
+        };
+        return res.render('content_page');
+      }
       if(redirect.type === 'new_page') {
         res.locals = {
           destination_url: redirect.destination_url
         }
-        res.render('hotspots_redirect')
+        return res.render('hotspots_redirect');
       } else {
-        res.redirect(redirect.destination_url);
+        return res.redirect(redirect.destination_url);
       }
     } catch(err){
       next(err);
