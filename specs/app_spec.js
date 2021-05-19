@@ -34,7 +34,7 @@ describe('App', () => {
 <html>
   <head>
     <title></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='stylesheets/style.css' />
   </head>
   <body>
     <h1>Oops!</h1>
