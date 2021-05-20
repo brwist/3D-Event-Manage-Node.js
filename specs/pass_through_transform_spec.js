@@ -16,7 +16,7 @@ const assert = require('assert');
 
 const { app } = require('../app');
 
-describe('App', () => {
+describe('App passthrough', () => {
   const client = 'a_client';
   const event = 'an_event';
 
@@ -85,6 +85,29 @@ describe('App', () => {
     });
 
     context('pass through for /locale/en.txt', () => {
+      context('when /locale/en.txt has no text having labels.<number>', () => {
+        const content = fs.readFileSync(`${fixurePath}no_labels.txt`, 'utf8');
+        let s3;
+
+        before((done) => {
+          s3 = AWSMock.S3({
+            params: { Bucket: 'experiences' },
+          });
+
+          s3.putObject({ Key: 'a_room/locale/en.txt', Body: content.toString() }, () => {
+            done();
+          });
+        });
+        it('returns file as it is', (done) => {
+          agent
+            .get(`${eventRoot}/a_room/locale/en.txt`)
+            .expect((res) => {
+              assert.strictEqual(res.text, content.toString());
+              assert.strictEqual(false, res.text.includes('labels.'));
+            })
+            .expect(200, done);
+        });
+      });
       context('when tooltip not found in redis', () => {
         const content = fs.readFileSync(`${fixurePath}unmatched_redis.txt`, 'utf8');
         let s3;
@@ -125,6 +148,7 @@ describe('App', () => {
             .get(`${eventRoot}/a_room/locale/en.txt`)
             .expect((res) => {
               assert.strictEqual(res.text, content.toString().replace('labels.10', 'Living room'));
+              assert.strictEqual(true, res.text.includes('Living room'));
             })
             .expect(200, done);
         });
@@ -151,6 +175,8 @@ describe('App', () => {
                 .replace('labels.10', 'Living room')
                 .replace('labels.11', 'Bed room');
               assert.strictEqual(res.text, expectedText);
+              assert.strictEqual(true, res.text.includes('Living room'));
+              assert.strictEqual(true, res.text.includes('Bed room'));
             })
             .expect(200, done);
         });
