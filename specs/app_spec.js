@@ -120,6 +120,19 @@ describe('App', () => {
           .expect(401, done);
       });
     });
+    context('when visiting :client/:event/login', () => {
+      it('should display login page', (done) => {
+        request(app)
+          .get('/any_client/any_event/login')
+          .expect((res) => {
+            // Provides User Name field
+            assert.strictEqual(true, res.text.includes('Username:'));
+            // Provides Password field
+            assert.strictEqual(true, res.text.includes('Password:'));
+          })
+          .expect(200, done);
+      });
+    });
     context('pass through', () => {
       it('does not allow ', (done) => {
         request(app)
@@ -209,6 +222,20 @@ describe('App', () => {
         .post(`${eventRoot}/login`)
         .send({ username: attendee.email, password })
         .end(done);
+    });
+
+    context('when visiting :client/:event/login', () => {
+      it('should display login page', (done) => {
+        agent
+          .get(`${eventRoot}/login`)
+          .expect((res) => {
+            // Provides User Name field
+            assert.strictEqual(true, res.text.includes('Username:'));
+            // Provides Password field
+            assert.strictEqual(true, res.text.includes('Password:'));
+          })
+          .expect(200, done);
+      });
     });
 
     context('attendees', () => {
