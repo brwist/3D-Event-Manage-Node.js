@@ -20,6 +20,7 @@ describe('App', () => {
   const hotspotId = 'an_id';
   const presignHotSpotId = 'presign_hotspot';
   const newPageHotSpotId = 'new_page_hotspot';
+  const pdfMimeHotspotId = 'pdf_mime_hotspot';
   const sourcePath = `/hotspots/${hotspotId}`;
   const destinationUrl = 'https://test.com';
 
@@ -77,6 +78,25 @@ describe('App', () => {
     presign: true,
   };
 
+  const preSignRedirectNewPage = {
+    id: `${presignHotSpotId}123`,
+    client: attendee.client,
+    event: attendee.event,
+    type: 'new_page',
+    destination_url: 'folder1/my_file.txt',
+    presign: false,
+  };
+
+  const pdfMimeRedirect = {
+    id: pdfMimeHotspotId,
+    client: attendee.client,
+    event: attendee.event,
+    type: 'display',
+    destination_url: 'https://wesite1.com/file.pdf',
+    presign: false,
+    mime_type: 'application/pdf',
+  };
+
   let database;
   let storage;
 
@@ -85,6 +105,7 @@ describe('App', () => {
     storage = createStorage({ database });
     storage.storeRedirect(redirect);
     storage.storeRedirect(newPageRedirect);
+    storage.storeRedirect(pdfMimeRedirect);
   });
 
   after(() => {
@@ -207,23 +228,39 @@ describe('App', () => {
 
     context('hotspots', () => {
       context('when hotspot has presign set true', () => {
-        before((done) => {
-          storage.storeRedirect(preSignRedirect);
-          const s3 = AWSMock.S3({
-            params: { Bucket: 'contents' },
-          });
+        context('and redirect type is new_page', () => {
+          before((done) => {
+            storage.storeRedirect(preSignRedirectNewPage);
+            const s3 = AWSMock.S3({
+              params: { Bucket: 'contents' },
+            });
 
-          s3.putObject({ Key: preSignRedirect.destination_url, Body: 'content' }, () => {
-            done();
+            s3.putObject({ Key: preSignRedirectNewPage.destination_url, Body: 'content' }, () => {
+              done();
+            });
+          });
+          it('generates presigned url and redirect given link', (done) => {
+            agent
+              .get(`/hotspots/${preSignRedirectNewPage.id}`)
+              .expect(200, done);
           });
         });
-        it('generates presigned url and renders page with given link', (done) => {
-          agent
-            .get(`/hotspots/${presignHotSpotId}`)
-            .expect((res) => {
-              assert.strictEqual(true, res.text.includes('Your file is here'));
-            })
-            .expect(200, done);
+        context('and redirect type is not set(default value)', () => {
+          before((done) => {
+            storage.storeRedirect(preSignRedirect);
+            const s3 = AWSMock.S3({
+              params: { Bucket: 'contents' },
+            });
+
+            s3.putObject({ Key: preSignRedirect.destination_url, Body: 'content' }, () => {
+              done();
+            });
+          });
+          it('generates presigned url and redirect to given link', (done) => {
+            agent
+              .get(`/hotspots/${presignHotSpotId}`)
+              .expect(302, done);
+          });
         });
       });
       context('when hotspot has presigned set falsy value', () => {
@@ -258,6 +295,21 @@ describe('App', () => {
               assert.strictEqual(res.text, page404);
             })
             .expect(404, done);
+        });
+      });
+      context('when hotspot has redirect type as display', () => {
+        context('and mime_type is application/pdf', () => {
+          it('renders page with pdf viewer', (done) => {
+            agent
+              .get(`${sourcePath}/${pdfMimeHotspotId}`)
+              .expect((res) => {
+                // response should contain link to pdf
+                assert.strictEqual(true, res.text.includes(pdfMimeRedirect.destination_url));
+                // response should contain pdf viewer plugin
+                assert.strictEqual(true, res.text.includes('http://www.adobe.com/products/acrobat/readstep2.html'));
+              })
+              .expect(200, done);
+          });
         });
       });
     });

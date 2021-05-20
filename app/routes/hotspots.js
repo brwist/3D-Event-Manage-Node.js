@@ -4,6 +4,7 @@ const { NotFoundError } = require('../utils/errors');
 const contentBucket = require('../lib/buckets/content');
 const { generatePresignedUrl } = require('../utils/s3');
 const { contentBucket: contentBucketConfig } = require('../configs/aws');
+const { mapMimeToView, separator } = require('../configs/mime');
 
 const router = express.Router();
 
@@ -26,23 +27,24 @@ module.exports = function(store) {
   router.get('*', async (req, res, next) => {
     try {
       const redirect = await retrieveRedirect(req.user, req.originalUrl);
+      let destination_url;
+
       if(redirect.presign) {
-        const bucketName = contentBucketConfig.bucket;
-        const key = redirect.destination_url;
-        const duration = 15 * 60; // Signed url expires in 15 minutes
-        const destination_url = generatePresignedUrl(contentBucket, bucketName, key, duration);
-        res.locals = {
-          destination_url: destination_url
-        };
-        return res.render('content_page');
-      }
-      if(redirect.type === 'new_page') {
-        res.locals = {
-          destination_url: redirect.destination_url
-        }
-        return res.render('hotspots_redirect');
+        destination_url = presignedUrlFromContentBucket(redirect.destination_url);
       } else {
-        return res.redirect(redirect.destination_url);
+        destination_url = redirect.destination_url;
+      }
+
+      res.locals = { destination_url };
+
+      switch(redirect.type) {
+        case 'new_page': 
+          return res.render('hotspots_redirect');
+        case 'display':
+          const renderPage = mapMimeToView[redirect.mime_type.replace('/', separator)]
+          return res.type('html').render(renderPage);
+        default:
+          return res.redirect(destination_url);
       }
     } catch(err){
       next(err);
@@ -50,4 +52,10 @@ module.exports = function(store) {
   });
 
   return router;
+}
+
+function presignedUrlFromContentBucket(key) {
+  const bucketName = contentBucketConfig.bucket;
+  const duration = 15 * 60; // Signed url expires in 15 minutes
+  return generatePresignedUrl(contentBucket, bucketName, key, duration);
 }
