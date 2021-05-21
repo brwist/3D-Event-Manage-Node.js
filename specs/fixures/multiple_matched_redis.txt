@@ -65,9 +65,9 @@ window_40D5B171_5564_438C_41D2_500511375F87.title = This is a test
 ## Hotspot
 
 ### Tooltip
-HotspotPanoramaOverlayArea_4075CF44_5364_5F94_41B7_0A1090096E10.toolTip = labels.10
-HotspotPanoramaOverlayArea_4075CF44_5364_5F94_41B7_0A1090096E11.toolTip = labels.10
-HotspotPanoramaOverlayArea_4075CF44_5364_5F94_41B7_0A1090096E12.toolTip = labels.11
+HotspotPanoramaOverlayArea_4075CF44_5364_5F94_41B7_0A1090096E10.toolTip = labels.text10
+HotspotPanoramaOverlayArea_4075CF44_5364_5F94_41B7_0A1090096E11.toolTip = labels.text10
+HotspotPanoramaOverlayArea_4075CF44_5364_5F94_41B7_0A1090096E12.toolTip = labels.text11
 HotspotPanoramaOverlayArea_586A3186_537D_C294_41C4_9DCA37A919C5.toolTip = View Painting
 HotspotPanoramaOverlayArea_586A4186_537D_C294_41CC_C31DD1494960.toolTip = View Door Detail
 HotspotPanoramaOverlayArea_586B4185_537D_C294_41C1_9A9852EBD17A.toolTip = View Bedroom Mirror

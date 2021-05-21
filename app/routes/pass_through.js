@@ -8,7 +8,7 @@ const experienceBucket = require('../lib/buckets/experience');
 const { experienceBucket: experienceBucketConfig } = require('../configs/aws');
 
 const router = express.Router({mergeParams: true});
-const hotspotRegex = /labels\.(\d+)/g
+const hotspotRegex = /labels\.(.+)/g
 
 module.exports = function(store) {
   router.get('/', async (req, res) => {

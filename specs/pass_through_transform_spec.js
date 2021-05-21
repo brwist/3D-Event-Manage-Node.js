@@ -35,20 +35,20 @@ describe('App passthrough', () => {
   });
 
   const label = {
-    id: 9,
+    id: 'text9',
     client: attendee.client,
     event: attendee.event,
     text: 'Kitchen',
   };
   const secondLabel = {
-    id: 10,
+    id: 'text10',
     client: attendee.client,
     event: attendee.event,
     text: 'Living room',
   };
 
   const thirdLabel = {
-    id: 11,
+    id: 'text11',
     client: attendee.client,
     event: attendee.event,
     text: 'Bed room',
@@ -85,7 +85,7 @@ describe('App passthrough', () => {
     });
 
     context('pass through for /locale/en.txt', () => {
-      context('when /locale/en.txt has no text having labels.<number>', () => {
+      context('when /locale/en.txt has no text having labels.<token>', () => {
         const content = fs.readFileSync(`${fixurePath}no_labels.txt`, 'utf8');
         let s3;
 
@@ -147,7 +147,7 @@ describe('App passthrough', () => {
           agent
             .get(`${eventRoot}/a_room/locale/en.txt`)
             .expect((res) => {
-              assert.strictEqual(res.text, content.toString().replace('labels.10', 'Living room'));
+              assert.strictEqual(res.text, content.toString().replace('labels.text10', 'Living room'));
               assert.strictEqual(true, res.text.includes('Living room'));
             })
             .expect(200, done);
@@ -171,9 +171,9 @@ describe('App passthrough', () => {
             .get(`${eventRoot}/a_room/locale/en.txt`)
             .expect((res) => {
               const expectedText = content.toString()
-                .replace('labels.10', 'Living room')
-                .replace('labels.10', 'Living room')
-                .replace('labels.11', 'Bed room');
+                .replace('labels.text10', 'Living room')
+                .replace('labels.text10', 'Living room')
+                .replace('labels.text11', 'Bed room');
               assert.strictEqual(res.text, expectedText);
               assert.strictEqual(true, res.text.includes('Living room'));
               assert.strictEqual(true, res.text.includes('Bed room'));

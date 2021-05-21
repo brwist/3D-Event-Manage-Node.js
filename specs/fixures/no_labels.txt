@@ -73,5 +73,5 @@ HotspotPanoramaOverlayArea_586BD186_537D_C294_41D0_25A52F7A1D7F.toolTip = This e
 ## Action
 
 ### URL
-PopupWebFrameBehaviour_435604A5_5364_4294_41BD_0F95CBA2C31E.url = /hotspots/8
-PopupWebFrameBehaviour_46C5DAE8_5364_469C_41C6_EEB2F0525C9E.url = /hotspots/8
+PopupWebFrameBehaviour_435604A5_5364_4294_41BD_0F95CBA2C31E.url = /hotspots/hello8
+PopupWebFrameBehaviour_46C5DAE8_5364_469C_41C6_EEB2F0525C9E.url = /hotspots/hello8
