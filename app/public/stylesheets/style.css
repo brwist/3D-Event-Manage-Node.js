@@ -1,8 +1,33 @@
 body {
-  padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
+}
+
+.logo-dimension {
+  width: 300px;
+  height:70px;
+}
+
+.logo {
+  position: fixed;
+  z-index:10;
+  top:20px;
+  left: 20px;
+}
+
+.login-image {
+  height:100%;
+  width:100%;
+}
+
+.text-uppercase {
+  text-transform: uppercase;
+}
+
+.login-content {
+  max-width: 500px;
+  margin:0 auto;
 }
