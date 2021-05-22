@@ -3,7 +3,7 @@
         <img src="{{loginLogo}}" class="logo-dimension" />
     </div>
     <div class="row">
-        <div class="col container-fluid" style="padding: 0;">
+        <div class="col container-fluid no-padding">
             <img src="{{loginBackground}}" class="login-image" />
         </div>
         <div class="col">
@@ -11,13 +11,12 @@
                 <h1 class="text-center text-uppercase">{{loginPrompt}}</h1>
                 <form class="mt-5" action="{{loginPath}}" method="post">
                     <div class="form-group w-100">
-                        <input type="email" class="form-control mt-5 blue-border" placeholder="name" name="username"
-                            style="border:2px solid #0a33a0;"></input>
-                        <input type="password" class="form-control mt-4" placeholder="password" name="password"
-                            style="border:2px solid #0a33a0;"></input>
+                        <input type="email" class="form-control mt-5 blue-border login-input" placeholder="name"
+                            name="username"></input>
+                        <input type="password" class="form-control mt-4 login-input" placeholder="password"
+                            name="password"></input>
                     </div>
-                    <input type="submit" value="login" class="btn btn-primary w-100 mt-4"
-                        style="background: #0a33a0;"></input>
+                    <input type="submit" value="login" class="btn btn-primary w-100 mt-4 blue-background"></input>
                 </form>
             </div>
         </div>
