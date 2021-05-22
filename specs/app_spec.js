@@ -31,19 +31,6 @@ describe('App', () => {
   const now = new Date().getTime();
   const tomorrow = now + solarDay;
   const yesterday = now - solarDay;
-  const page404 = `<!DOCTYPE html>
-<html>
-  <head>
-    <title></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1>Oops!</h1>
-<p>We could not find what you were looking for.</p>
-
-  </body>
-</html>
-`;
 
   const attendee = new Attendee({
     name: 'Pedro Pepito', client, event, email, password,
@@ -121,14 +108,28 @@ describe('App', () => {
       });
     });
     context('when visiting :client/:event/login', () => {
+      before((done) => {
+        storage.storeEventConfiguration({ client, event, eventKey: 'login_background', eventValue: 'mybackground.jpg' });
+        storage.storeEventConfiguration({ client, event, eventKey: 'login_logo', eventValue: 'mylogo.png' });
+        storage.storeEventConfiguration({ client, event, eventKey: 'login_prompt', eventValue: 'Hello' });
+        done();
+      });
       it('should display login page', (done) => {
         request(app)
-          .get('/any_client/any_event/login')
+          .get(`/${client}/${event}/login`)
           .expect((res) => {
             // Provides User Name field
-            assert.strictEqual(true, res.text.includes('Username:'));
+            assert.strictEqual(true, res.text.includes('input type="email"'));
             // Provides Password field
-            assert.strictEqual(true, res.text.includes('Password:'));
+            assert.strictEqual(true, res.text.includes('input type="password"'));
+            // Provides submit Button
+            assert.strictEqual(true, res.text.includes('input type="submit"'));
+            // renders login background image
+            assert.strictEqual(true, res.text.includes('img src="mybackground.jpg"'));
+            // renders llogo
+            assert.strictEqual(true, res.text.includes('img src="mylogo.png"'));
+            // renders prompt text
+            assert.strictEqual(true, res.text.includes('Hello'));
           })
           .expect(200, done);
       });
@@ -171,7 +172,7 @@ describe('App', () => {
           .type('form')
           .send({ username: attendee.email, password })
           .expect((res) => {
-            assert.strictEqual(res.text, page404);
+            assert.strictEqual(true, res.text.includes('We could not find what you were looking for.'));
           })
           .expect(404, done);
       });
@@ -225,14 +226,28 @@ describe('App', () => {
     });
 
     context('when visiting :client/:event/login', () => {
+      before((done) => {
+        storage.storeEventConfiguration({ client, event, eventKey: 'login_background', eventValue: 'mybackground.jpg' });
+        storage.storeEventConfiguration({ client, event, eventKey: 'login_logo', eventValue: 'mylogo.png' });
+        storage.storeEventConfiguration({ client, event, eventKey: 'login_prompt', eventValue: 'Hello' });
+        done();
+      });
       it('should display login page', (done) => {
         agent
           .get(`${eventRoot}/login`)
           .expect((res) => {
             // Provides User Name field
-            assert.strictEqual(true, res.text.includes('Username:'));
+            assert.strictEqual(true, res.text.includes('input type="email"'));
             // Provides Password field
-            assert.strictEqual(true, res.text.includes('Password:'));
+            assert.strictEqual(true, res.text.includes('input type="password"'));
+            // Provides submit Button
+            assert.strictEqual(true, res.text.includes('input type="submit"'));
+            // renders login background image
+            assert.strictEqual(true, res.text.includes('img src="mybackground.jpg"'));
+            // renders llogo
+            assert.strictEqual(true, res.text.includes('img src="mylogo.png"'));
+            // renders prompt text
+            assert.strictEqual(true, res.text.includes('Hello'));
           })
           .expect(200, done);
       });
@@ -319,7 +334,7 @@ describe('App', () => {
           agent
             .get('/hotspots/notfound')
             .expect((res) => {
-              assert.strictEqual(res.text, page404);
+              assert.strictEqual(true, res.text.includes('We could not find what you were looking for.'));
             })
             .expect(404, done);
         });
