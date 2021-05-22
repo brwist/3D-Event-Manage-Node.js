@@ -8,7 +8,8 @@
     "dev": "nodemon app.js",
     "pretest": "`npm bin`/eslint *.js app/models/**/*.js specs/**/*.js --fix",
     "test": "`npm bin`/nyc --reporter=text mocha specs && npm audit",
-    "coverage": "`npm bin`/nyc --reporter=html mocha specs"
+    "coverage": "`npm bin`/nyc --reporter=html mocha specs",
+    "check-coverage":"nyc check-coverage --lines 95 --functions 97 --statements 96 --branches 81.58"
   },
   "license": "UNLICENSED",
   "private": true,

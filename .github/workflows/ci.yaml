@@ -37,6 +37,6 @@ jobs:
         run: |
           npm run test
 
-      - name: Print Coverage report
+      - name: Check Coverage Threshold
         run: |
-          npm run coverage
+          npm run check-coverage
