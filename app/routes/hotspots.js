@@ -35,13 +35,13 @@ module.exports = function(store) {
         destination_url = redirect.destination_url;
       }
 
-      res.locals = { destination_url };
+      res.locals = { destination_url, mime_type: redirect.mime_type };
 
       switch(redirect.type) {
         case 'new_page': 
           return res.render('hotspots_redirect');
         case 'display':
-          const renderPage = mapMimeToView[redirect.mime_type.replace('/', separator)]
+          const renderPage = mapMimeToView(redirect.mime_type)
           return res.type('html').render(renderPage);
         default:
           return res.redirect(destination_url);
