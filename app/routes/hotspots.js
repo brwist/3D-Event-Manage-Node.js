@@ -4,7 +4,7 @@ const { NotFoundError } = require('../utils/errors');
 const contentBucket = require('../lib/buckets/content');
 const { generatePresignedUrl } = require('../utils/s3');
 const { contentBucket: contentBucketConfig } = require('../configs/aws');
-const { mapMimeToView, separator } = require('../configs/mime');
+const { mapMimeToView } = require('../configs/mime');
 
 const router = express.Router();
 

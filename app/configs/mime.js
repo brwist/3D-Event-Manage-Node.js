@@ -12,6 +12,8 @@ module.exports = {
     switch(mimeType) {
       case 'application/pdf':
         return 'media/pdf';
+      case (mimeType.match(/video\/quicktime|mp4/) || {}).input:
+        return 'media/video';
     }
   }
 }
