@@ -18,4 +18,10 @@ describe('Mime View Selector', () => {
       assert.strictEqual('media/video', mapMimeToView('video/mp4'));
     });
   });
+
+  context('unknown media', () => {
+    it('renders unknown media page', () => {
+      assert.strictEqual('media/unknown', mapMimeToView('video/something'));
+    });
+  });
 });
