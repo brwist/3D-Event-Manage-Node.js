@@ -171,9 +171,6 @@ describe('App', () => {
           .post(`${eventRoot}/login`)
           .type('form')
           .send({ username: attendee.email, password })
-          .expect((res) => {
-            assert.strictEqual(true, res.text.includes('We could not find what you were looking for.'));
-          })
           .expect(404, done);
       });
     });
@@ -333,9 +330,6 @@ describe('App', () => {
         it('returns 404', (done) => {
           agent
             .get('/hotspots/notfound')
-            .expect((res) => {
-              assert.strictEqual(true, res.text.includes('We could not find what you were looking for.'));
-            })
             .expect(404, done);
         });
       });

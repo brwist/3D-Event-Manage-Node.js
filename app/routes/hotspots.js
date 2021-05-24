@@ -4,7 +4,7 @@ const { NotFoundError } = require('../utils/errors');
 const contentBucket = require('../lib/buckets/content');
 const { generatePresignedUrl } = require('../utils/s3');
 const { contentBucket: contentBucketConfig } = require('../configs/aws');
-const { mapMimeToView, separator } = require('../configs/mime');
+const { mapMimeToView } = require('../configs/mime');
 
 const router = express.Router();
 
@@ -35,13 +35,13 @@ module.exports = function(store) {
         destination_url = redirect.destination_url;
       }
 
-      res.locals = { destination_url };
+      res.locals = { destination_url, mime_type: redirect.mime_type };
 
       switch(redirect.type) {
         case 'new_page': 
           return res.render('hotspots_redirect');
         case 'display':
-          const renderPage = mapMimeToView[redirect.mime_type.replace('/', separator)]
+          const renderPage = mapMimeToView(redirect.mime_type)
           return res.type('html').render(renderPage);
         default:
           return res.redirect(destination_url);
