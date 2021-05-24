@@ -34,7 +34,7 @@ module.exports = function(store) {
       });
     } catch(error) {
       if(error.code === 'NoSuchKey') {
-        error = NotFoundError('Could not retrieve the file you were looking for.');
+        error = NotFoundError(error.message);
       }
       throw(error);
     }

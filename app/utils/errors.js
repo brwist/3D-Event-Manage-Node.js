@@ -1,20 +1,14 @@
-class GeneralError extends Error {
+class NotFoundError extends Error {
   constructor(message) {
-    super();
-    this.message = message;
+    super(message);
+    this._status = 404;
   }
 
-  getCode() {
-    if (this instanceof NotFoundError) {
-      return 404;
-    }
-    return 500;
+  get status() {
+    return this._status;
   }
 }
 
-class NotFoundError extends GeneralError { }
-
 module.exports = {
-  GeneralError,
-  NotFoundError
+  NotFoundError,
 };

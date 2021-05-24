@@ -1,29 +1,13 @@
-const { GeneralError } = require('../utils/errors');
+const debug = require('debug')('router-error');
 
 const handleErrors = (error, req, res, next) => {
-  let httpStatus;
-  let page;
+  debug('Encountered error: %O', error);
 
-  // set value of httpStatus
-  if(error.status) {
-    httpStatus = error.status;
-  } else if (error instanceof GeneralError) {
-    httpStatus = error.getCode();
-  } else {
-    httpStatus = 500;
+  if(error.status != 404) {
+    // let default handler take care of unknown error
+    throw error;
   }
-
-  // set page to render
-  if(httpStatus === 404) {
-    page = '404';
-  } else {
-    res.local = {
-      message: error.message || 'Something went wrong',
-      error
-    }
-    page = 'error';
-  }
-  return res.status(httpStatus).type('html').render(page);
+  return res.status(404).render('404');
 }
 
 module.exports = handleErrors;
