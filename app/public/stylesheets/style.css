@@ -43,3 +43,8 @@ a {
 .no-padding {
   padding: 0;
 }
+
+.pdf {
+  min-height: 100vh;
+  width: 100%;
+}
