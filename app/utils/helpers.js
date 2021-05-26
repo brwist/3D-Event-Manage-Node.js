@@ -17,7 +17,40 @@ function fetchEventConfig(store, client, event, configKey) {
   });
 }
 
+function fetchSystemConfig(store, systemKey) {
+  return new Promise((resolve, reject) => {
+    // get system configuration from Redis
+    store.retrieveSystemConfiguration(systemKey, (value) => {
+      resolve(value);
+    });
+  });
+}
+
+// fetchSystemConfigOrFallback method tries to fetch given event config
+// if not found then  will return system config
+async function fetchSystemConfigOrFallback(store, client, event, configKey) {
+  const eventSpecificValue = await fetchEventConfig(store, client, event, configKey);
+  const systemValue = await fetchSystemConfig(store, configKey);
+  return eventSpecificValue || systemValue;
+}
+
+async function fetchLoginBackground(store, client, event) {
+  return (await fetchSystemConfigOrFallback(store, client, event, 'login_background'));
+}
+
+async function fetchLoginLogo(store, client, event) {
+  return (await fetchSystemConfigOrFallback(store, client, event, 'login_logo'));
+}
+
+async function fetchLoginPrompt(store, client, event) {
+  return (await fetchSystemConfigOrFallback(store, client, event, 'login_prompt'));
+}
+
 module.exports = {
   isEventLive,
-  fetchEventConfig
+  fetchEventConfig,
+  fetchSystemConfig,
+  fetchLoginBackground,
+  fetchLoginLogo,
+  fetchLoginPrompt
 }

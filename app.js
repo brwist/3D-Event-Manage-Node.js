@@ -15,7 +15,7 @@ const { authenticate, authenticateClientEvent } = require('./app/middlewares/aut
 const { redirectToLogin } = require('./app/utils/redirect');
 const { isEventLive } = require('./app/utils/helpers');
 const { NotFoundError } = require('./app/utils/errors');
-const { fetchEventConfig } = require('./app/utils/helpers');
+const { fetchLoginBackground, fetchLoginLogo, fetchLoginPrompt } = require('./app/utils/helpers');
 const handleErrors = require('./app/middlewares/error');
 
 const privateKey = process.env.SESSION_KEY;
@@ -88,9 +88,9 @@ app.set('view engine', 'hbs');
 app.get('/:client/:event/login', async (req, res) => {
   const { client, event } = req.params;
   const loginPath = req.originalUrl;
-  const loginBackground = await fetchEventConfig(store, client, event, 'login_background');
-  const loginLogo = await fetchEventConfig(store, client, event, 'login_logo');
-  const loginPrompt = await fetchEventConfig(store, client, event, 'login_prompt');
+  const loginBackground = await fetchLoginBackground(store, client, event);
+  const loginLogo = await fetchLoginLogo(store, client, event);
+  const loginPrompt = await fetchLoginPrompt(store, client, event);
   res.locals = {
     loginPath,
     loginBackground,

@@ -18,6 +18,9 @@ describe('App', () => {
   const client = 'a_client';
   const event = 'an_event';
   const hotspotId = 'an_id';
+  const systemLoginBackground = 'http://img.com/my-image.jpg';
+  const systemLoginLogo = 'http://img.com/my-logo.png';
+  const systemLoginPrompt = 'Default Prompt';
   const presignHotSpotId = 'presign_hotspot';
   const newPageHotSpotId = 'new_page_hotspot';
   const pdfMimeHotspotId = 'pdf_mime_hotspot';
@@ -93,6 +96,10 @@ describe('App', () => {
     storage.storeRedirect(redirect);
     storage.storeRedirect(newPageRedirect);
     storage.storeRedirect(pdfMimeRedirect);
+    // store system default configuration
+    storage.storeSystemConfiguration({ name: 'login_background', value: systemLoginBackground });
+    storage.storeSystemConfiguration({ name: 'login_logo', value: systemLoginLogo });
+    storage.storeSystemConfiguration({ name: 'login_prompt', value: systemLoginPrompt });
   });
 
   after(() => {
@@ -108,30 +115,41 @@ describe('App', () => {
       });
     });
     context('when visiting :client/:event/login', () => {
-      before((done) => {
-        storage.storeEventConfiguration({ client, event, eventKey: 'login_background', eventValue: 'mybackground.jpg' });
-        storage.storeEventConfiguration({ client, event, eventKey: 'login_logo', eventValue: 'mylogo.png' });
-        storage.storeEventConfiguration({ client, event, eventKey: 'login_prompt', eventValue: 'Hello' });
-        done();
+      context('when event specific login background, login logo and login prompt were not configured', () => {
+        it('should display login background, login logo and login prompt from system config', (done) => {
+          request(app)
+            .get(`/${client}/${event}/login`)
+            .expect((res) => {
+              // renders system login background image
+              assert.strictEqual(true, res.text.includes(`img src="${systemLoginBackground}"`));
+              // renders system logo
+              assert.strictEqual(true, res.text.includes(`img src="${systemLoginLogo}"`));
+              // renders system prompt text
+              assert.strictEqual(true, res.text.includes(systemLoginPrompt));
+            })
+            .expect(200, done);
+        });
       });
-      it('should display login page', (done) => {
-        request(app)
-          .get(`/${client}/${event}/login`)
-          .expect((res) => {
-            // Provides User Name field
-            assert.strictEqual(true, res.text.includes('input type="email"'));
-            // Provides Password field
-            assert.strictEqual(true, res.text.includes('input type="password"'));
-            // Provides submit Button
-            assert.strictEqual(true, res.text.includes('input type="submit"'));
-            // renders login background image
-            assert.strictEqual(true, res.text.includes('img src="mybackground.jpg"'));
-            // renders llogo
-            assert.strictEqual(true, res.text.includes('img src="mylogo.png"'));
-            // renders prompt text
-            assert.strictEqual(true, res.text.includes('Hello'));
-          })
-          .expect(200, done);
+      context('when event specific login background, login logo and login prompt were configured', () => {
+        before((done) => {
+          storage.storeEventConfiguration({ client, event, eventKey: 'login_background', eventValue: 'mybackground.jpg' });
+          storage.storeEventConfiguration({ client, event, eventKey: 'login_logo', eventValue: 'mylogo.png' });
+          storage.storeEventConfiguration({ client, event, eventKey: 'login_prompt', eventValue: 'Hello' });
+          done();
+        });
+        it('should display login page', (done) => {
+          request(app)
+            .get(`/${client}/${event}/login`)
+            .expect((res) => {
+              // renders event based login background image
+              assert.strictEqual(true, res.text.includes('img src="mybackground.jpg"'));
+              // renders event based logo
+              assert.strictEqual(true, res.text.includes('img src="mylogo.png"'));
+              // renders event based prompt text
+              assert.strictEqual(true, res.text.includes('Hello'));
+            })
+            .expect(200, done);
+        });
       });
     });
     context('pass through', () => {
