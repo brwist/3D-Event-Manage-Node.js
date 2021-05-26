@@ -7,7 +7,7 @@ const handleErrors = (error, req, res, next) => {
     // let default handler take care of unknown error
     throw error;
   }
-  return res.status(404).render('404');
+  return res.type('.html').status(404).render('404');
 }
 
 module.exports = handleErrors;
