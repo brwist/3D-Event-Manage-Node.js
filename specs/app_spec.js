@@ -21,6 +21,7 @@ describe('App', () => {
   const systemLoginBackground = 'http://img.com/my-image.jpg';
   const systemLoginLogo = 'http://img.com/my-logo.png';
   const systemLoginPrompt = 'Default Prompt';
+  const systemDefaultRedirect = '/default/redirect';
   const presignHotSpotId = 'presign_hotspot';
   const newPageHotSpotId = 'new_page_hotspot';
   const pdfMimeHotspotId = 'pdf_mime_hotspot';
@@ -100,6 +101,7 @@ describe('App', () => {
     storage.storeSystemConfiguration({ name: 'login_background', value: systemLoginBackground });
     storage.storeSystemConfiguration({ name: 'login_logo', value: systemLoginLogo });
     storage.storeSystemConfiguration({ name: 'login_prompt', value: systemLoginPrompt });
+    storage.storeSystemConfiguration({ name: 'default_redirect', value: systemDefaultRedirect });
   });
 
   after(() => {
@@ -174,6 +176,14 @@ describe('App', () => {
         request(app)
           .get(`${eventRoot}/attendees`)
           .expect('Location', `${eventRoot}/login`, done);
+      });
+    });
+    context('when visits path that does not have event', () => {
+      it('redirects to default redirect path', (done) => {
+        request(app)
+          .get('/random')
+          .expect('Location', systemDefaultRedirect)
+          .expect(302, done);
       });
     });
   });
@@ -265,6 +275,15 @@ describe('App', () => {
             assert.strictEqual(true, res.text.includes('Hello'));
           })
           .expect(200, done);
+      });
+    });
+
+    context('when visits path that does not have event', () => {
+      it('should redirect to event base path', (done) => {
+        agent
+          .get('/random')
+          .expect('Location', eventRoot)
+          .expect(302, done);
       });
     });
 

@@ -46,11 +46,16 @@ async function fetchLoginPrompt(store, client, event) {
   return (await fetchSystemConfigOrFallback(store, client, event, 'login_prompt'));
 }
 
+async function fetchDefaultRedirect(store) {
+  return (await fetchSystemConfig(store, 'default_redirect'));
+}
+
 module.exports = {
   isEventLive,
   fetchEventConfig,
   fetchSystemConfig,
   fetchLoginBackground,
   fetchLoginLogo,
-  fetchLoginPrompt
+  fetchLoginPrompt,
+  fetchDefaultRedirect
 }
