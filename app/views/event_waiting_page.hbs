@@ -1,0 +1,33 @@
+<h1>This event has not started yet</h1>
+<p>Event starts in:</p>
+<p id="counter"></p>
+
+<script>
+  const decodedJson = decodeURIComponent("{{{encodedJson}}}");
+  const jsonObj = JSON.parse(decodedJson);
+  const startTime = jsonObj.startTime;
+  const target = document.getElementById('counter');
+
+  // Update the count down every 1 second
+  var counter = setInterval(function() {
+
+    // Get today's date and time
+    var now = new Date().getTime();
+
+    var gap = startTime - now;
+
+    // Time calculations for hours, minutes and seconds
+    var days = Math.floor(gap / (1000 * 60 * 60 * 24));
+    var hours = Math.floor((gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)) + 24 * days;
+    var minutes = Math.floor((gap % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((gap % (1000 * 60)) / 1000);
+
+    target.innerHTML = hours + 'h ' + minutes + 'm ' + seconds + 's ';
+
+    // If the count down is finished
+    if (gap < 0) {
+      clearInterval(counter);
+      target.innerHTML = "Event has started, please reload this page.";
+    }
+  }, 1000);
+</script>
