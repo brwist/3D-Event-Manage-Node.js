@@ -163,11 +163,29 @@ describe('RedisStorage', () => {
       });
     });
 
-    it('fetches destination', () => {
+    it('fetches event configuration', () => {
       subject.storeEventConfiguration(eventConfig);
 
       subject.retrieveEventConfiguration(client, event, eventKey, (value) => {
         assert.strictEqual(eventValue, value);
+      });
+    });
+  });
+  context('system configuration', () => {
+    const systemConfig = { name: 'default_redirect', value: '/home' };
+    it('stores system configuration', () => {
+      subject.storeSystemConfiguration(systemConfig);
+
+      database.hget('config', systemConfig.name, (err, value) => {
+        assert.strictEqual(systemConfig.value, value);
+      });
+    });
+
+    it('fetches system configuration', () => {
+      subject.storeSystemConfiguration(systemConfig);
+
+      subject.retrieveSystemConfiguration(systemConfig.name, (value) => {
+        assert.strictEqual(systemConfig.value, value);
       });
     });
   });

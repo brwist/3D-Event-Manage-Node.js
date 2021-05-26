@@ -21,6 +21,10 @@ module.exports = function storage(options) {
     return `event.${client}.${event}`;
   }
 
+  function getSystemConfigurationKey() {
+    return 'config';
+  }
+
   return {
     _database: options.database,
     storeLabel(value) {
@@ -73,6 +77,17 @@ module.exports = function storage(options) {
       const key = computeEventConfigurationKey(client, event);
       this._database.hget(key, eventKey, (err, reply) => {
         debug('Event Configuration %s %s result: %o error: %o', key, eventKey, reply, err);
+        callback(reply);
+      });
+    },
+    storeSystemConfiguration(config) {
+      const key = getSystemConfigurationKey();
+      this._database.hset(key, config.name, config.value);
+    },
+    retrieveSystemConfiguration(configKey, callback) {
+      const key = getSystemConfigurationKey();
+      this._database.hget(key, configKey, (err, reply) => {
+        debug('System Configuration %s %s result: %o error: %o', key, configKey, reply, err);
         callback(reply);
       });
     },
