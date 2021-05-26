@@ -13,8 +13,7 @@ const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
 const { authenticate, authenticateClientEvent } = require('./app/middlewares/authenticate');
 const { redirectToLogin, redirectToEvent } = require('./app/utils/redirect');
-const { isEventLive } = require('./app/utils/helpers');
-const { NotFoundError } = require('./app/utils/errors');
+const { fetchEventConfig } = require('./app/utils/helpers');
 const { fetchLoginBackground, fetchLoginLogo, fetchLoginPrompt, fetchDefaultRedirect } = require('./app/utils/helpers');
 const handleErrors = require('./app/middlewares/error');
 
@@ -104,19 +103,25 @@ app.post('/:client/:event/login',
   async (req, res, next) => {
     const { client, event } = req.params;
     try {
-      const eventLive = await isEventLive(store, client, event);
-      // if event is not live then send NotFoundError
-      if (!eventLive) {
-        throw new NotFoundError('Event has not started or has finished.');
-      }
       passport.authenticate('local', (err, user) => {
         if (err || !user) {
           redirectToLogin(req, res);
         } else {
-          req.logIn(user, (loginErr) => {
+          req.logIn(user, async (loginErr) => {
             if (loginErr) { throw loginErr; }
 
-            res.redirect(`/${client}/${event}`);
+            const now = new Date().getTime();
+            const startTime = await fetchEventConfig(store, client, event, 'start_time');
+            const endTime = await fetchEventConfig(store, client, event, 'end_time');
+
+            if (parseInt(startTime, 10) > now) {
+              return res.render('event_waiting_page', {
+                encodedJson: encodeURIComponent(JSON.stringify({ startTime })),
+              });
+            } else if (parseInt(endTime, 10) < now) { // event has expired
+              return res.render('event_expired_page');
+            }
+            return res.redirect(`/${client}/${event}`);
           });
         }
       })(req, res, next);

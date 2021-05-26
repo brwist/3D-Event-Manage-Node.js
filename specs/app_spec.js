@@ -193,13 +193,30 @@ describe('App', () => {
       storage.storeAttendee(attendee);
       storage.storeAttendee(attendee2);
     });
-    describe('and event is not live', () => {
-      it('returns 404 when logging in', (done) => {
+    describe('and event has not started', () => {
+      before(() => {
+        storage.storeEventConfiguration({ client, event, eventKey: 'start_time', eventValue: tomorrow });
+        storage.storeEventConfiguration({ client, event, eventKey: 'end_time', eventValue: (tomorrow + solarDay) });
+      });
+      it('renders event has not started page', (done) => {
         request(app)
           .post(`${eventRoot}/login`)
           .type('form')
           .send({ username: attendee.email, password })
-          .expect(404, done);
+          .expect(200, done);
+      });
+    });
+    describe('and event has ended', () => {
+      before(() => {
+        storage.storeEventConfiguration({ client, event, eventKey: 'start_time', eventValue: (yesterday - solarDay) });
+        storage.storeEventConfiguration({ client, event, eventKey: 'end_time', eventValue: yesterday });
+      });
+      it('renders event has finished page', (done) => {
+        request(app)
+          .post(`${eventRoot}/login`)
+          .type('form')
+          .send({ username: attendee.email, password })
+          .expect(200, done);
       });
     });
     describe('and event is live', () => {
