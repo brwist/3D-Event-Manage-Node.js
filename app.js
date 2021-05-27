@@ -11,7 +11,7 @@ const Attendee = require('./app/models/attendee');
 const hotspots = require('./app/routes/hotspots');
 const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
-const { authenticate, authenticateClientEvent } = require('./app/middlewares/authenticate');
+const { authenticate, authenticateClientEvent, usernameToLowerCase } = require('./app/middlewares/authenticate');
 const { redirectToLogin, redirectToEvent } = require('./app/utils/redirect');
 const { fetchEventConfig } = require('./app/utils/helpers');
 const { fetchLoginBackground, fetchLoginLogo, fetchLoginPrompt, fetchDefaultRedirect } = require('./app/utils/helpers');
@@ -99,7 +99,7 @@ app.get('/:client/:event/login', async (req, res) => {
   res.render('login');
 });
 
-app.post('/:client/:event/login',
+app.post('/:client/:event/login', usernameToLowerCase,
   async (req, res, next) => {
     const { client, event } = req.params;
     try {
@@ -114,6 +114,7 @@ app.post('/:client/:event/login',
             const startTime = await fetchEventConfig(store, client, event, 'start_time');
             const endTime = await fetchEventConfig(store, client, event, 'end_time');
 
+            // event has not started yet
             if (parseInt(startTime, 10) > now) {
               return res.render('event_waiting_page', {
                 encodedJson: encodeURIComponent(JSON.stringify({ startTime })),

@@ -16,7 +16,13 @@ function authenticateClientEvent(req, res, next) {
   }
 }
 
+function usernameToLowerCase(req, res, next){
+  req.body.username = req.body.username.toLowerCase();
+  next();
+}
+
 module.exports = {
   authenticate,
-  authenticateClientEvent
+  authenticateClientEvent,
+  usernameToLowerCase
 }

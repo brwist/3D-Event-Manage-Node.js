@@ -193,6 +193,16 @@ describe('App', () => {
       storage.storeAttendee(attendee);
       storage.storeAttendee(attendee2);
     });
+    describe('when user name is provided in uppercase', () => {
+      it('treats username as case insensitive and allows login by redirecting to event base', (done) => {
+        request(app)
+          .post(`${eventRoot}/login`)
+          .type('form')
+          .send({ username: attendee.email.toUpperCase(), password })
+          .expect('Location', eventRoot)
+          .expect(302, done);
+      });
+    });
     describe('and event has not started', () => {
       before(() => {
         storage.storeEventConfiguration({ client, event, eventKey: 'start_time', eventValue: tomorrow });
