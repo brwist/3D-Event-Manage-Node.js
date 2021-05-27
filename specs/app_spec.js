@@ -24,7 +24,7 @@ describe('App', () => {
   const systemDefaultRedirect = '/default/redirect';
   const presignHotSpotId = 'presign_hotspot';
   const newPageHotSpotId = 'new_page_hotspot';
-  const pdfMimeHotspotId = 'pdf_mime_hotspot';
+  const pdfHotspotId = 'pdf_mime_hotspot';
   const sourcePath = `/hotspots/${hotspotId}`;
   const destinationUrl = 'https://test.com';
 
@@ -78,14 +78,48 @@ describe('App', () => {
     presign: false,
   };
 
-  const pdfMimeRedirect = {
-    id: pdfMimeHotspotId,
+  const pdfRedirect = {
+    id: pdfHotspotId,
     client: attendee.client,
     event: attendee.event,
     type: 'display',
     destination_url: 'https://wesite1.com/file.pdf',
     presign: false,
     mime_type: 'application/pdf',
+    disable_downloads: true,
+  };
+
+  const downloadablePdfRedirect = {
+    id: 'downloadablePdfRedirectId',
+    client: attendee.client,
+    event: attendee.event,
+    type: 'display',
+    destination_url: 'https://wesite1.com/myDownloadable-file.pdf',
+    presign: false,
+    mime_type: 'application/pdf',
+    disable_downloads: false,
+  };
+
+  const videoRedirect = {
+    id: 'videoRedirectId',
+    client: attendee.client,
+    event: attendee.event,
+    type: 'display',
+    destination_url: 'https://wesite1.com/my-video.mp4',
+    presign: false,
+    mime_type: 'video/mp4',
+    disable_downloads: true,
+  };
+
+  const downloadableVideoRedirect = {
+    id: 'downloadableVideoRedirectId',
+    client: attendee.client,
+    event: attendee.event,
+    type: 'display',
+    destination_url: 'https://wesite1.com/my-downloadable-video.mp4',
+    presign: false,
+    mime_type: 'video/mp4',
+    disable_downloads: false,
   };
 
   let database;
@@ -96,7 +130,10 @@ describe('App', () => {
     storage = createStorage({ database });
     storage.storeRedirect(redirect);
     storage.storeRedirect(newPageRedirect);
-    storage.storeRedirect(pdfMimeRedirect);
+    storage.storeRedirect(pdfRedirect);
+    storage.storeRedirect(downloadablePdfRedirect);
+    storage.storeRedirect(videoRedirect);
+    storage.storeRedirect(downloadableVideoRedirect);
     // store system default configuration
     storage.storeSystemConfiguration({ name: 'login_background', value: systemLoginBackground });
     storage.storeSystemConfiguration({ name: 'login_logo', value: systemLoginLogo });
@@ -399,16 +436,55 @@ describe('App', () => {
       });
       context('when hotspot has redirect type as display', () => {
         context('and mime_type is application/pdf', () => {
-          it('renders page with pdf viewer', (done) => {
-            agent
-              .get(`${sourcePath}/${pdfMimeHotspotId}`)
-              .expect((res) => {
-                // response should contain link to pdf
-                assert.strictEqual(true, res.text.includes(pdfMimeRedirect.destination_url));
-                // response should contain pdf viewer plugin
-                assert.strictEqual(true, res.text.includes('http://www.adobe.com/products/acrobat/readstep2.html'));
-              })
-              .expect(200, done);
+          context('and pdf is not downloadable', () => {
+            it('renders page with pdf viewer and no nav options', (done) => {
+              agent
+                .get(`${sourcePath}/${pdfRedirect.id}`)
+                .expect((res) => {
+                  // response should not contain nav enabled
+                  console.log('pdfRedirect');
+                  console.log(res.text);
+                  assert.strictEqual(true, res.text.includes(`${pdfRedirect.destination_url}#toolbar=0&navpanes=0`));
+                })
+                .expect(200, done);
+            });
+          });
+          context('and pdf is downloadable', () => {
+            it('renders page with pdf viewer and nav options', (done) => {
+              agent
+                .get(`${sourcePath}/${downloadablePdfRedirect.id}`)
+                .expect((res) => {
+                  // response should contain link to pdf
+                  assert.strictEqual(true, res.text.includes(downloadablePdfRedirect.destination_url));
+                  // response should not toolbar set 0
+                  assert.strictEqual(false, res.text.includes(`${downloadablePdfRedirect.destination_url}#toolbar=0&navpanes=0`));
+                })
+                .expect(200, done);
+            });
+          });
+        });
+        context('and mime_type type is video', () => {
+          context('and video is not downloadable', () => {
+            it('renders video player with no download option', (done) => {
+              agent
+                .get(`${sourcePath}/${videoRedirect.id}`)
+                .expect((res) => {
+                  // response should contain controlsList="nodownload"
+                  assert.strictEqual(true, res.text.includes('controlsList="nodownload"'));
+                })
+                .expect(200, done);
+            });
+          });
+          context('and video is downloadable', () => {
+            it('renders video with download options', (done) => {
+              agent
+                .get(`${sourcePath}/${downloadableVideoRedirect.id}`)
+                .expect((res) => {
+                  // response should not controlsList="nodownload"
+                  assert.strictEqual(false, res.text.includes('controlsList="nodownload"'));
+                })
+                .expect(200, done);
+            });
           });
         });
       });

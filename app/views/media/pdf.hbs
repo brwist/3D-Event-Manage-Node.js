@@ -1,1 +1,5 @@
+{{#if disable_downloads}}
+<embed src="{{destination_url}}#toolbar=0&navpanes=0" class="pdf" alt="pdf" type="{{mime_type}}" pluginspage="http://www.adobe.com/products/acrobat/readstep2.html">
+{{else}}
 <embed src="{{destination_url}}" class="pdf" alt="pdf" type="{{mime_type}}" pluginspage="http://www.adobe.com/products/acrobat/readstep2.html">
+{{/if}}

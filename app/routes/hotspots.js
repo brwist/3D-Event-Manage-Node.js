@@ -35,7 +35,11 @@ module.exports = function(store) {
         destination_url = redirect.destination_url;
       }
 
-      res.locals = { destination_url, mime_type: redirect.mime_type };
+      res.locals = {
+        destination_url,
+        mime_type: redirect.mime_type,
+        disable_downloads: redirect.disable_downloads,
+      };
 
       switch(redirect.type) {
         case 'new_page': 
