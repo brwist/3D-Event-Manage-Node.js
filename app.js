@@ -7,6 +7,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 require('dotenv').config();
 
+const logout = require('./app/routes/logout');
 const Attendee = require('./app/models/attendee');
 const hotspots = require('./app/routes/hotspots');
 const passThrough = require('./app/routes/pass_through');
@@ -130,6 +131,8 @@ app.post('/:client/:event/login', usernameToLowerCase,
       next(err);
     }
   });
+
+app.get('/:client/:event/logout', logout);
 
 app.use('/hotspots', authenticate, hotspots(store));
 

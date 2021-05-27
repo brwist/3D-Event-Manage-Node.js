@@ -455,4 +455,23 @@ describe('App', () => {
       });
     });
   });
+
+  describe('logging out', () => {
+    context('when visiting :client/:event/logout', () => {
+      let agent;
+      before((done) => {
+        agent = request.agent(app);
+        agent
+          .post(`${eventRoot}/login`)
+          .send({ username: attendee.email, password })
+          .end(done);
+      });
+      it('it destroys user session and redirects to event login', (done) => {
+        agent
+          .get(`${eventRoot}/logout`)
+          .expect('Location', `${eventRoot}/login`)
+          .expect(302, done);
+      });
+    });
+  });
 });
