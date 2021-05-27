@@ -38,7 +38,14 @@ module.exports = function storage(options) {
       });
     },
     storeRedirect(value) {
-      const content = marshall({ destination_url: value.destination_url, tooltip: value.tooltip, type: value.type, presign: value.presign, mime_type: value.mime_type });
+      const content = marshall({
+        destination_url: value.destination_url,
+        tooltip: value.tooltip,
+        type: value.type,
+        presign: value.presign,
+        mime_type: value.mime_type,
+        disable_downloads: value.disable_downloads,
+      });
       this._database.hset(computeHotspotKey(value.client, value.event), value.id, content);
     },
     retrieveRedirect(client, event, sourcePath, callback) {
