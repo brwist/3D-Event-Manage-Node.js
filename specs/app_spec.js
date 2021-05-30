@@ -294,10 +294,11 @@ describe('App', () => {
     });
 
     context('when visiting :client/:event/login', () => {
-      it('should display login page', (done) => {
+      it('redirect to event root', (done) => {
         agent
           .get(`${eventRoot}/login`)
-          .expect(200, done);
+          .expect('Location', eventRoot)
+          .expect(302, done);
       });
     });
 
@@ -401,8 +402,6 @@ describe('App', () => {
                 .get(`${sourcePath}/${pdfRedirect.id}`)
                 .expect((res) => {
                   // response should not contain nav enabled
-                  console.log('pdfRedirect');
-                  console.log(res.text);
                   assert.strictEqual(true, res.text.includes(`${pdfRedirect.destination_url}#toolbar=0&navpanes=0`));
                 })
                 .expect(200, done);

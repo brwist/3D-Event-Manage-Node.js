@@ -86,22 +86,30 @@ app.set('views', `${__dirname}/app/views`);
 app.set('view engine', 'hbs');
 
 app.get('/:client/:event/login', async (req, res) => {
+
   const loginPath = req.originalUrl;
   const loginBackground = await fetchLoginBackground(store);
   const loginLogo = await fetchLoginLogo(store);
   const loginPrompt = await fetchLoginPrompt(store);
-  res.locals = {
-    loginPath,
-    loginBackground,
-    loginLogo,
-    loginPrompt,
-  };
-  res.render('login');
+
+  if (req.isAuthenticated()) {
+    const { client, event } = req.params;
+    res.redirect(`/${client}/${event}`);
+  } else {
+    res.locals = {
+      loginPath,
+      loginBackground,
+      loginLogo,
+      loginPrompt,
+    };
+    res.render('login');
+  }
 });
 
 app.post('/:client/:event/login', usernameToLowerCase,
   async (req, res, next) => {
     const { client, event } = req.params;
+
     try {
       passport.authenticate('local', (err, user) => {
         if (err || !user) {
