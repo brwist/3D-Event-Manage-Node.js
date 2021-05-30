@@ -15,18 +15,21 @@ async function downloadFromS3(s3Client, bucket, key) {
   }
 }
 
-function generatePresignedUrl(s3Client, bucket, key, duration) {
-  var params = { Bucket: bucket, Key: key, Expires: duration };
-  return s3Client.getSignedUrl('getObject', params);
+async function generatePresignedUrl(s3Client, bucket, key, duration) {
+  return new Promise((resolve, reject) => {
+    var params = { Bucket: bucket, Key: key, Expires: duration };
+
+    s3Client.getSignedUrl('getObject', params, (err, url) => { resolve(url) });
+  });
 }
 
-function presignedUrlFromContentBucket(key) {
+async function presignedUrlFromContentBucket(key) {
   const bucketName = contentBucket.bucket;
   const duration = 15 * 60; // Signed url expires in 15 minutes
-  return generatePresignedUrl(s3Client, bucketName, key, duration);
+  return await generatePresignedUrl(s3Client, bucketName, key, duration);
 }
 
 module.exports = {
   downloadFromS3,
-  presignedUrlFromContentBucket: presignedUrlFromContentBucket
+  presignedUrlFromContentBucket
 }

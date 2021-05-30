@@ -18,8 +18,8 @@ describe('App', () => {
   const client = 'a_client';
   const event = 'an_event';
   const hotspotId = 'an_id';
-  const systemLoginBackground = 'http://img.com/my-image.jpg';
-  const systemLoginLogo = 'http://img.com/my-logo.png';
+  const systemLoginBackground = 'config/my-image.jpg';
+  const systemLoginLogo = 'config/my-logo.png';
   const systemLoginPrompt = 'Default Prompt';
   const systemDefaultRedirect = '/default/redirect';
   const presignHotSpotId = 'presign_hotspot';
@@ -125,7 +125,7 @@ describe('App', () => {
   let database;
   let storage;
 
-  before(() => {
+  before((done) => {
     database = redisMock.createClient();
     storage = createStorage({ database });
     storage.storeRedirect(redirect);
@@ -139,6 +139,15 @@ describe('App', () => {
     storage.storeSystemConfiguration({ name: 'login_logo', value: systemLoginLogo });
     storage.storeSystemConfiguration({ name: 'login_prompt', value: systemLoginPrompt });
     storage.storeSystemConfiguration({ name: 'default_redirect', value: systemDefaultRedirect });
+    const s3 = AWSMock.S3({
+      params: { Bucket: 'contents' },
+    });
+
+    s3.putObject({ Key: systemLoginBackground, Body: 'content' }, () => {
+      s3.putObject({ Key: systemLoginLogo, Body: 'content' }, () => {
+        done();
+      });
+    });
   });
 
   after(() => {
@@ -159,11 +168,8 @@ describe('App', () => {
           request(app)
             .get(`/${client}/${event}/login`)
             .expect((res) => {
-              // renders system login background image
-              assert.strictEqual(true, res.text.includes(`img src="${systemLoginBackground}"`));
-              // renders system logo
-              assert.strictEqual(true, res.text.includes(`img src="${systemLoginLogo}"`));
-              // renders system prompt text
+              assert.strictEqual(true, res.text.includes(systemLoginBackground));
+              assert.strictEqual(true, res.text.includes(systemLoginLogo));
               assert.strictEqual(true, res.text.includes(systemLoginPrompt));
             })
             .expect(200, done);
@@ -309,9 +315,9 @@ describe('App', () => {
         agent
           .get(`${otherEventRoot}/login`)
           .expect((res) => {
-            assert.strictEqual(true, res.text.includes(`img src="${systemLoginBackground}"`));
-            assert.strictEqual(true, res.text.includes(`img src="${systemLoginLogo}"`));
-            assert.strictEqual(true, res.text.includes(systemLoginPrompt));
+            assert.match(res.text, new RegExp(systemLoginBackground));
+            assert.match(res.text, new RegExp(systemLoginLogo));
+            assert.match(res.text, new RegExp(systemLoginPrompt));
           })
           .expect(200, done);
       });

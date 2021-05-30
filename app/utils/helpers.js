@@ -1,3 +1,5 @@
+const { presignedUrlFromContentBucket } = require('../utils/s3');
+
 function fetchEventConfig(store, client, event, configKey) {
   return new Promise((resolve, reject) => {
     // get event configuration from Redis
@@ -17,11 +19,12 @@ function fetchSystemConfig(store, systemKey) {
 }
 
 async function fetchLoginBackground(store, client, event) {
-  return (await fetchSystemConfig(store, 'login_background'));
+  const key = await fetchSystemConfig(store, 'login_background');
+  return await presignedUrlFromContentBucket(key);
 }
 
 async function fetchLoginLogo(store, client, event) {
-  return (await fetchSystemConfig(store, 'login_logo'));
+  return await presignedUrlFromContentBucket(await fetchSystemConfig(store, 'login_logo'));
 }
 
 async function fetchLoginPrompt(store) {

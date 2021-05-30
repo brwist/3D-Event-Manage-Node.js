@@ -28,7 +28,7 @@ module.exports = function(store) {
       let destination_url;
 
       if(redirect.presign) {
-        destination_url = presignedUrlFromContentBucket(redirect.destination_url);
+        destination_url = await presignedUrlFromContentBucket(redirect.destination_url);
       } else {
         destination_url = redirect.destination_url;
       }
