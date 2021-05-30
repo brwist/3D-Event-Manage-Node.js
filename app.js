@@ -7,15 +7,13 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 require('dotenv').config();
 
-const logout = require('./app/routes/logout');
+const createAuthentication = require('./app/routes/authentication');
 const Attendee = require('./app/models/attendee');
 const hotspots = require('./app/routes/hotspots');
 const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
-const { isAuthenticated, ensureAuthenticated, redirectUnauthenticated, usernameToLowerCase } = require('./app/middlewares/authenticate');
-const { redirectToLogin, redirectToEvent } = require('./app/utils/redirect');
-const { fetchEventConfig } = require('./app/utils/helpers');
-const { fetchLoginBackground, fetchLoginLogo, fetchLoginPrompt, fetchDefaultRedirect } = require('./app/utils/helpers');
+const { redirectToEvent } = require('./app/utils/redirect');
+const { fetchDefaultRedirect } = require('./app/utils/helpers');
 const handleErrors = require('./app/middlewares/error');
 
 const privateKey = process.env.SESSION_KEY;
@@ -54,11 +52,12 @@ const app = express();
 const environmentFactory = environment(app);
 const redisClient = environmentFactory.createRedisClient();
 const store = createStorage({ database: redisClient });
+const authentication = createAuthentication(store, passport);
 
 passport.use(new LocalStrategy({ passReqToCallback: true },
   (req, username, password, done) => {
     const { client, event } = req.params;
-    store.retrieveAttendee(client, event, username, (err, attendee) => {
+    store.retrieveAttendee(client, event, username.toLowerCase(), (err, attendee) => {
       if (err) {
         done(err, false);
       } else {
@@ -85,64 +84,13 @@ app.use(express.static(`${__dirname}/app/public`));
 app.set('views', `${__dirname}/app/views`);
 app.set('view engine', 'hbs');
 
-app.get('/:client/:event/login', async (req, res) => {
-  const loginPath = req.originalUrl;
-  const loginBackground = await fetchLoginBackground(store);
-  const loginLogo = await fetchLoginLogo(store);
-  const loginPrompt = await fetchLoginPrompt(store);
+app.get('/:client/:event/login', authentication.loginPage);
+app.post('/:client/:event/login', authentication.login);
+app.get('/:client/:event/logout', authentication.logout);
 
-  if (isAuthenticated(req)) {
-    const { client, event } = req.params;
-    res.redirect(`/${client}/${event}`);
-  } else {
-    res.locals = {
-      loginPath,
-      loginBackground,
-      loginLogo,
-      loginPrompt,
-    };
-    res.render('login');
-  }
-});
+app.use('/hotspots', authentication.ensureAuthenticated, hotspots(store));
 
-app.post('/:client/:event/login', usernameToLowerCase,
-  async (req, res, next) => {
-    const { client, event } = req.params;
-
-    try {
-      passport.authenticate('local', (err, user) => {
-        if (err || !user) {
-          redirectToLogin(req, res);
-        } else {
-          req.logIn(user, async (loginErr) => {
-            if (loginErr) { throw loginErr; }
-
-            const now = new Date().getTime();
-            const startTime = await fetchEventConfig(store, client, event, 'start_time');
-            const endTime = await fetchEventConfig(store, client, event, 'end_time');
-
-            // event has not started yet
-            if (parseInt(startTime, 10) > now) {
-              return res.render('event_waiting_page', {
-                encodedJson: encodeURIComponent(JSON.stringify({ startTime })),
-              });
-            } else if (parseInt(endTime, 10) < now) { // event has expired
-              return res.render('event_expired_page');
-            }
-            return res.redirect(`/${client}/${event}`);
-          });
-        }
-      })(req, res, next);
-    } catch (err) {
-      next(err);
-    }
-  });
-
-app.get('/:client/:event/logout', logout);
-
-app.use('/hotspots', ensureAuthenticated, hotspots(store));
-
-app.get('/:client/:event/attendees', redirectUnauthenticated, (req, res) => {
+app.get('/:client/:event/attendees', authentication.redirectUnauthenticated, (req, res) => {
   const attendees = Object.values(req.sessionStore.sessions)
     .map(sessionsStore => JSON.parse(sessionsStore))
     .map(parsedSession => JSON.parse(parsedSession.passport.user))
@@ -151,7 +99,7 @@ app.get('/:client/:event/attendees', redirectUnauthenticated, (req, res) => {
   res.render('attendees');
 });
 
-app.use('/:client/:event', redirectUnauthenticated, passThrough(store));
+app.use('/:client/:event', authentication.redirectUnauthenticated, passThrough(store));
 
 app.use('*', async (req, res) => {
   if (req.isAuthenticated()) {
