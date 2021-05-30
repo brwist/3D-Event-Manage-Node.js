@@ -1,18 +1,22 @@
-const {redirectToLogin} = require('../utils/redirect')
+const { redirectToLogin } = require('../utils/redirect')
 
-function authenticate(req, res, next) {
-  if (!req.isAuthenticated()) {
-    res.status(401).end();
-  } else {
+function isAuthenticated(req) {
+ return req.isAuthenticated();
+}
+
+function ensureAuthenticated(req, res, next) {
+  if (isAuthenticated(req)) {
     next();
+  } else {
+    res.status(401).end();
   }
 }
 
-function authenticateClientEvent(req, res, next) {
-  if (!req.isAuthenticated()) {
-    redirectToLogin(req,res);
-  } else {
+function redirectUnauthenticated(req, res, next) {
+  if (isAuthenticated(req)) {
     next();
+  } else {
+    redirectToLogin(req,res);
   }
 }
 
@@ -22,7 +26,8 @@ function usernameToLowerCase(req, res, next){
 }
 
 module.exports = {
-  authenticate,
-  authenticateClientEvent,
+  isAuthenticated,
+  ensureAuthenticated,
+  redirectUnauthenticated,
   usernameToLowerCase
 }

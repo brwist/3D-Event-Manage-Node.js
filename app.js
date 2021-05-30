@@ -12,7 +12,7 @@ const Attendee = require('./app/models/attendee');
 const hotspots = require('./app/routes/hotspots');
 const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
-const { authenticate, authenticateClientEvent, usernameToLowerCase } = require('./app/middlewares/authenticate');
+const { isAuthenticated, ensureAuthenticated, redirectUnauthenticated, usernameToLowerCase } = require('./app/middlewares/authenticate');
 const { redirectToLogin, redirectToEvent } = require('./app/utils/redirect');
 const { fetchEventConfig } = require('./app/utils/helpers');
 const { fetchLoginBackground, fetchLoginLogo, fetchLoginPrompt, fetchDefaultRedirect } = require('./app/utils/helpers');
@@ -86,13 +86,12 @@ app.set('views', `${__dirname}/app/views`);
 app.set('view engine', 'hbs');
 
 app.get('/:client/:event/login', async (req, res) => {
-
   const loginPath = req.originalUrl;
   const loginBackground = await fetchLoginBackground(store);
   const loginLogo = await fetchLoginLogo(store);
   const loginPrompt = await fetchLoginPrompt(store);
 
-  if (req.isAuthenticated()) {
+  if (isAuthenticated(req)) {
     const { client, event } = req.params;
     res.redirect(`/${client}/${event}`);
   } else {
@@ -141,9 +140,9 @@ app.post('/:client/:event/login', usernameToLowerCase,
 
 app.get('/:client/:event/logout', logout);
 
-app.use('/hotspots', authenticate, hotspots(store));
+app.use('/hotspots', ensureAuthenticated, hotspots(store));
 
-app.get('/:client/:event/attendees', authenticateClientEvent, (req, res) => {
+app.get('/:client/:event/attendees', redirectUnauthenticated, (req, res) => {
   const attendees = Object.values(req.sessionStore.sessions)
     .map(sessionsStore => JSON.parse(sessionsStore))
     .map(parsedSession => JSON.parse(parsedSession.passport.user))
@@ -152,7 +151,7 @@ app.get('/:client/:event/attendees', authenticateClientEvent, (req, res) => {
   res.render('attendees');
 });
 
-app.use('/:client/:event', authenticateClientEvent, passThrough(store));
+app.use('/:client/:event', redirectUnauthenticated, passThrough(store));
 
 app.use('*', async (req, res) => {
   if (req.isAuthenticated()) {
