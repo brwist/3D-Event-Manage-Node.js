@@ -2,7 +2,11 @@ const { redirectToLogin } = require('../utils/redirect')
 const { fetchEventConfig, fetchLoginBackground, fetchLoginLogo, fetchLoginPrompt } = require('../utils/helpers');
 
 function isAuthenticated(req) {
-  return req.isAuthenticated();
+  const {client, event} = req.params;
+
+  return req.isAuthenticated() &&
+    req.user.client == client &&
+    req.user.event == event;
 }
 
 function logout(req, res) {
@@ -12,7 +16,7 @@ function logout(req, res) {
 }
 
 function ensureAuthenticated(req, res, next) {
-  if (isAuthenticated(req)) {
+  if (req.isAuthenticated()) {
     next();
   } else {
     res.status(401).end();

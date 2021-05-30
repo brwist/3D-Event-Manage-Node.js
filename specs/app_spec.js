@@ -302,6 +302,21 @@ describe('App', () => {
       });
     });
 
+    context('when visiting different :client/:event/login', () => {
+      const otherEventRoot = '/other/event';
+
+      it('logs out user and redirects to login', (done) => {
+        agent
+          .get(`${otherEventRoot}/login`)
+          .expect((res) => {
+            assert.strictEqual(true, res.text.includes(`img src="${systemLoginBackground}"`));
+            assert.strictEqual(true, res.text.includes(`img src="${systemLoginLogo}"`));
+            assert.strictEqual(true, res.text.includes(systemLoginPrompt));
+          })
+          .expect(200, done);
+      });
+    });
+
     context('when visits path that does not have event', () => {
       it('should redirect to event base path', (done) => {
         agent
@@ -356,6 +371,7 @@ describe('App', () => {
               done();
             });
           });
+
           it('generates presigned url and redirect to given link', (done) => {
             agent
               .get(`/hotspots/${presignHotSpotId}`)
