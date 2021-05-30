@@ -1,9 +1,7 @@
 const express = require('express');
 const url = require('url');
 const { NotFoundError } = require('../utils/errors');
-const contentBucket = require('../lib/buckets/content');
-const { generatePresignedUrl } = require('../utils/s3');
-const { contentBucket: contentBucketConfig } = require('../configs/aws');
+const { presignUrlFromContentBucket } = require('../utils/s3');
 const { mapMimeToView } = require('../configs/mime');
 
 const router = express.Router();
@@ -30,7 +28,7 @@ module.exports = function(store) {
       let destination_url;
 
       if(redirect.presign) {
-        destination_url = presignedUrlFromContentBucket(redirect.destination_url);
+        destination_url = presignUrlFromContentBucket(redirect.destination_url);
       } else {
         destination_url = redirect.destination_url;
       }
@@ -58,8 +56,3 @@ module.exports = function(store) {
   return router;
 }
 
-function presignedUrlFromContentBucket(key) {
-  const bucketName = contentBucketConfig.bucket;
-  const duration = 15 * 60; // Signed url expires in 15 minutes
-  return generatePresignedUrl(contentBucket, bucketName, key, duration);
-}
