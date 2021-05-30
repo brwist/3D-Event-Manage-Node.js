@@ -86,11 +86,10 @@ app.set('views', `${__dirname}/app/views`);
 app.set('view engine', 'hbs');
 
 app.get('/:client/:event/login', async (req, res) => {
-  const { client, event } = req.params;
   const loginPath = req.originalUrl;
-  const loginBackground = await fetchLoginBackground(store, client, event);
-  const loginLogo = await fetchLoginLogo(store, client, event);
-  const loginPrompt = await fetchLoginPrompt(store, client, event);
+  const loginBackground = await fetchLoginBackground(store);
+  const loginLogo = await fetchLoginLogo(store);
+  const loginPrompt = await fetchLoginPrompt(store);
   res.locals = {
     loginPath,
     loginBackground,

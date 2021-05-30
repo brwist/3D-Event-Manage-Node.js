@@ -20,7 +20,7 @@ function generatePresignedUrl(s3Client, bucket, key, duration) {
   return s3Client.getSignedUrl('getObject', params);
 }
 
-function presignUrlFromContentBucket(key) {
+function presignedUrlFromContentBucket(key) {
   const bucketName = contentBucket.bucket;
   const duration = 15 * 60; // Signed url expires in 15 minutes
   return generatePresignedUrl(s3Client, bucketName, key, duration);
@@ -28,5 +28,5 @@ function presignUrlFromContentBucket(key) {
 
 module.exports = {
   downloadFromS3,
-  presignUrlFromContentBucket
+  presignedUrlFromContentBucket: presignedUrlFromContentBucket
 }

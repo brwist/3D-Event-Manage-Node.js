@@ -16,24 +16,16 @@ function fetchSystemConfig(store, systemKey) {
   });
 }
 
-// fetchSystemConfigOrFallback method tries to fetch given event config
-// if not found then  will return system config
-async function fetchSystemConfigOrFallback(store, client, event, configKey) {
-  const eventSpecificValue = await fetchEventConfig(store, client, event, configKey);
-  const systemValue = await fetchSystemConfig(store, configKey);
-  return eventSpecificValue || systemValue;
-}
-
 async function fetchLoginBackground(store, client, event) {
-  return (await fetchSystemConfigOrFallback(store, client, event, 'login_background'));
+  return (await fetchSystemConfig(store, 'login_background'));
 }
 
 async function fetchLoginLogo(store, client, event) {
-  return (await fetchSystemConfigOrFallback(store, client, event, 'login_logo'));
+  return (await fetchSystemConfig(store, 'login_logo'));
 }
 
-async function fetchLoginPrompt(store, client, event) {
-  return (await fetchSystemConfigOrFallback(store, client, event, 'login_prompt'));
+async function fetchLoginPrompt(store) {
+  return (await fetchSystemConfig(store, 'login_prompt'));
 }
 
 async function fetchDefaultRedirect(store) {
@@ -42,7 +34,6 @@ async function fetchDefaultRedirect(store) {
 
 module.exports = {
   fetchEventConfig,
-  fetchSystemConfig,
   fetchLoginBackground,
   fetchLoginLogo,
   fetchLoginPrompt,

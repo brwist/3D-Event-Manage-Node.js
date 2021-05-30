@@ -169,27 +169,6 @@ describe('App', () => {
             .expect(200, done);
         });
       });
-      context('when event specific login background, login logo and login prompt were configured', () => {
-        before((done) => {
-          storage.storeEventConfiguration({ client, event, eventKey: 'login_background', eventValue: 'mybackground.jpg' });
-          storage.storeEventConfiguration({ client, event, eventKey: 'login_logo', eventValue: 'mylogo.png' });
-          storage.storeEventConfiguration({ client, event, eventKey: 'login_prompt', eventValue: 'Hello' });
-          done();
-        });
-        it('should display login page', (done) => {
-          request(app)
-            .get(`/${client}/${event}/login`)
-            .expect((res) => {
-              // renders event based login background image
-              assert.strictEqual(true, res.text.includes('img src="mybackground.jpg"'));
-              // renders event based logo
-              assert.strictEqual(true, res.text.includes('img src="mylogo.png"'));
-              // renders event based prompt text
-              assert.strictEqual(true, res.text.includes('Hello'));
-            })
-            .expect(200, done);
-        });
-      });
     });
     context('pass through', () => {
       it('does not allow ', (done) => {
@@ -315,29 +294,9 @@ describe('App', () => {
     });
 
     context('when visiting :client/:event/login', () => {
-      before((done) => {
-        storage.storeEventConfiguration({ client, event, eventKey: 'login_background', eventValue: 'mybackground.jpg' });
-        storage.storeEventConfiguration({ client, event, eventKey: 'login_logo', eventValue: 'mylogo.png' });
-        storage.storeEventConfiguration({ client, event, eventKey: 'login_prompt', eventValue: 'Hello' });
-        done();
-      });
       it('should display login page', (done) => {
         agent
           .get(`${eventRoot}/login`)
-          .expect((res) => {
-            // Provides User Name field
-            assert.strictEqual(true, res.text.includes('input type="email"'));
-            // Provides Password field
-            assert.strictEqual(true, res.text.includes('input type="password"'));
-            // Provides submit Button
-            assert.strictEqual(true, res.text.includes('input type="submit"'));
-            // renders login background image
-            assert.strictEqual(true, res.text.includes('img src="mybackground.jpg"'));
-            // renders llogo
-            assert.strictEqual(true, res.text.includes('img src="mylogo.png"'));
-            // renders prompt text
-            assert.strictEqual(true, res.text.includes('Hello'));
-          })
           .expect(200, done);
       });
     });
