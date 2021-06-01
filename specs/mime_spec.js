@@ -19,13 +19,13 @@ describe('Mime View Selector', () => {
     });
   });
 
-  context('PowerPoint', () => {
-    it('selects PowerPoint', () => {
-      assert.strictEqual('media/powerpoint', mapMimeToView('application/vnd.ms-powerpoint'));
+  context('GView', () => {
+    it('selects GView', () => {
+      assert.strictEqual('media/gviewer', mapMimeToView('application/vnd.ms-powerpoint'));
     });
 
-    it('selects PowerPoint', () => {
-      assert.strictEqual('media/powerpoint', mapMimeToView('application/vnd.openxmlformats-officedocument.presentationml.presentation'));
+    it('selects GView', () => {
+      assert.strictEqual('media/gviewer', mapMimeToView('application/vnd.openxmlformats-officedocument.presentationml.presentation'));
     });
   });
 

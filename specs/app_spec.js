@@ -503,7 +503,7 @@ describe('App', () => {
             agent
               .get(`${sourcePath}/${powerpointRedirect.id}`)
               .expect((res) => {
-                assert.strictEqual(true, res.text.includes(`https://docs.google.com/viewer?url=${powerpointRedirect.destination_url}&embedded=true`));
+                assert.strictEqual(true, res.text.includes(`https://docs.google.com/gview?url=${powerpointRedirect.destination_url}&embedded=true`));
               })
               .expect(200, done);
           });
