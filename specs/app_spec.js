@@ -168,7 +168,6 @@ describe('App', () => {
           request(app)
             .get(`/${client}/${event}/login`)
             .expect((res) => {
-              assert.strictEqual(true, res.text.includes(systemLoginBackground));
               assert.strictEqual(true, res.text.includes(systemLoginLogo));
               assert.strictEqual(true, res.text.includes(systemLoginPrompt));
             })
@@ -315,7 +314,6 @@ describe('App', () => {
         agent
           .get(`${otherEventRoot}/login`)
           .expect((res) => {
-            assert.match(res.text, new RegExp(systemLoginBackground));
             assert.match(res.text, new RegExp(systemLoginLogo));
             assert.match(res.text, new RegExp(systemLoginPrompt));
           })

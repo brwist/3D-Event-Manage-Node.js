@@ -1,5 +1,5 @@
 const { redirectToLogin } = require('../utils/redirect')
-const { fetchEventConfig, fetchLoginBackground, fetchLoginLogo, fetchLoginPrompt, fetchStylingColor } = require('../utils/helpers');
+const { fetchEventConfig, fetchLoginLogo, fetchLoginPrompt } = require('../utils/helpers');
 
 function isAuthenticated(req) {
   const {client, event} = req.params;
@@ -37,23 +37,14 @@ module.exports = (store, passport) => {
       ensureAuthenticated,
       redirectUnauthenticated,
       loginPage: async (req, res) => {
-        const loginPath = req.originalUrl;
-        const loginBackground = await fetchLoginBackground(store);
-        const loginLogo = await fetchLoginLogo(store);
-        const loginPrompt = await fetchLoginPrompt(store);
-        const stylingColor = await fetchStylingColor(store);
-
         if (isAuthenticated(req)) {
           const {client, event} = req.params;
           res.redirect(`/${client}/${event}`);
         } else {
-          res.locals = {
-            loginPath,
-            loginBackground,
-            loginLogo,
-            loginPrompt,
-            stylingColor
-          };
+          res.locals.loginPath = req.originalUrl;
+          res.locals.loginLogo = await fetchLoginLogo(store);
+          res.locals.loginPrompt = await fetchLoginPrompt(store);
+
           res.render('login');
         }
       },

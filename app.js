@@ -14,6 +14,7 @@ const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
 const { redirectToEvent } = require('./app/utils/redirect');
 const { fetchDefaultRedirect } = require('./app/utils/helpers');
+const loadConfig = require('./app/middlewares/load_config');
 const handleErrors = require('./app/middlewares/error');
 
 const privateKey = process.env.SESSION_KEY;
@@ -84,6 +85,7 @@ app.use(express.static(`${__dirname}/app/public`));
 app.set('views', `${__dirname}/app/views`);
 app.set('view engine', 'hbs');
 
+app.use(loadConfig.initialize(store));
 app.get('/:client/:event/login', authentication.loginPage);
 app.post('/:client/:event/login', authentication.login);
 app.get('/:client/:event/logout', authentication.logout);

@@ -18,9 +18,8 @@ function fetchSystemConfig(store, systemKey) {
   });
 }
 
-async function fetchLoginBackground(store, client, event) {
-  const key = await fetchSystemConfig(store, 'login_background');
-  return await presignedUrlFromContentBucket(key);
+async function fetchCustomFont(store) {
+  return await presignedUrlFromContentBucket(await fetchSystemConfig(store, 'custom_font'));
 }
 
 async function fetchLoginLogo(store, client, event) {
@@ -41,7 +40,7 @@ async function fetchStylingColor(store) {
 
 module.exports = {
   fetchEventConfig,
-  fetchLoginBackground,
+  fetchCustomFont,
   fetchLoginLogo,
   fetchLoginPrompt,
   fetchStylingColor,
