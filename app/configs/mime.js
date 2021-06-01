@@ -14,6 +14,9 @@ module.exports = {
         return 'media/pdf';
       case (mimeType.match(/video\/quicktime|mp4/) || {}).input:
         return 'media/video';
+      case 'application/vnd.ms-powerpoint':
+      case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+        return 'media/powerpoint';
       default:
         return 'media/unknown';
     }

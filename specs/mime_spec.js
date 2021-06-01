@@ -19,6 +19,16 @@ describe('Mime View Selector', () => {
     });
   });
 
+  context('PowerPoint', () => {
+    it('selects PowerPoint', () => {
+      assert.strictEqual('media/powerpoint', mapMimeToView('application/vnd.ms-powerpoint'));
+    });
+
+    it('selects PowerPoint', () => {
+      assert.strictEqual('media/powerpoint', mapMimeToView('application/vnd.openxmlformats-officedocument.presentationml.presentation'));
+    });
+  });
+
   context('unknown media', () => {
     it('renders unknown media page', () => {
       assert.strictEqual('media/unknown', mapMimeToView('video/something'));

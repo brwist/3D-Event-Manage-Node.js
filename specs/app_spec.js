@@ -122,6 +122,17 @@ describe('App', () => {
     disable_downloads: false,
   };
 
+  const powerpointRedirect = {
+    id: 'powerpointRedirectId',
+    client: attendee.client,
+    event: attendee.event,
+    type: 'display',
+    destination_url: 'https://wesite1.com/my-presenattion.ppt',
+    presign: false,
+    mime_type: 'application/vnd.ms-powerpoint',
+    disable_downloads: false,
+  };
+
   let database;
   let storage;
 
@@ -134,6 +145,7 @@ describe('App', () => {
     storage.storeRedirect(downloadablePdfRedirect);
     storage.storeRedirect(videoRedirect);
     storage.storeRedirect(downloadableVideoRedirect);
+    storage.storeRedirect(powerpointRedirect);
     // store system default configuration
     storage.storeSystemConfiguration({ name: 'login_background', value: systemLoginBackground });
     storage.storeSystemConfiguration({ name: 'login_logo', value: systemLoginLogo });
@@ -463,6 +475,16 @@ describe('App', () => {
                 })
                 .expect(200, done);
             });
+          });
+        });
+        context('and mime_type is PowerPoint', () => {
+          it('renders PowerPoint', (done) => {
+            agent
+              .get(`${sourcePath}/${powerpointRedirect.id}`)
+              .expect((res) => {
+                assert.strictEqual(true, res.text.includes(`https://docs.google.com/viewer?url=${powerpointRedirect.destination_url}&embedded=true`));
+              })
+              .expect(200, done);
           });
         });
       });
