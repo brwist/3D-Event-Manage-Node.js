@@ -144,6 +144,14 @@ describe('App', () => {
     disable_downloads: false,
   };
 
+  const kitchenNavigationRedirect = {
+    id: 'kitchenNavigationRedirectId',
+    client: attendee.client,
+    event: attendee.event,
+    type: 'navigation',
+    destination_url: 'kitchen', // destination_url should store room id
+  };
+
   let database;
   let storage;
 
@@ -158,6 +166,7 @@ describe('App', () => {
     storage.storeRedirect(downloadableVideoRedirect);
     storage.storeRedirect(powerpointRedirect);
     storage.storeRedirect(imageRedirect);
+    storage.storeRedirect(kitchenNavigationRedirect);
     // store system default configuration
     storage.storeSystemConfiguration({ name: 'login_background', value: systemLoginBackground });
     storage.storeSystemConfiguration({ name: 'login_logo', value: systemLoginLogo });
@@ -508,6 +517,14 @@ describe('App', () => {
               })
               .expect(200, done);
           });
+        });
+      });
+      context('when hotspot has redirect type as navigation', () => {
+        it('redirects to room', (done) => {
+          agent
+            .get(`${sourcePath}/${kitchenNavigationRedirect.id}`)
+            .expect('Location', `${eventRoot}/${kitchenNavigationRedirect.destination_url}/index.htm`)
+            .expect(302, done);
         });
       });
     });

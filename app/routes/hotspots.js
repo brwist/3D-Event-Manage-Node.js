@@ -45,6 +45,8 @@ module.exports = function(store) {
         case 'display':
           const renderPage = mapMimeToView(redirect.mime_type)
           return res.type('html').render(renderPage);
+        case 'navigation':
+          return res.redirect(`/${req.user.client}/${req.user.event}/${destination_url}/index.htm`);
         default:
           return res.redirect(destination_url);
       }
