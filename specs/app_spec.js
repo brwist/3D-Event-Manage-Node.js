@@ -133,6 +133,17 @@ describe('App', () => {
     disable_downloads: false,
   };
 
+  const imageRedirect = {
+    id: 'imageRedirectId',
+    client: attendee.client,
+    event: attendee.event,
+    type: 'display',
+    destination_url: 'https://wesite1.com/my-image.jpg',
+    presign: false,
+    mime_type: 'image/jpeg',
+    disable_downloads: false,
+  };
+
   let database;
   let storage;
 
@@ -146,6 +157,7 @@ describe('App', () => {
     storage.storeRedirect(videoRedirect);
     storage.storeRedirect(downloadableVideoRedirect);
     storage.storeRedirect(powerpointRedirect);
+    storage.storeRedirect(imageRedirect);
     // store system default configuration
     storage.storeSystemConfiguration({ name: 'login_background', value: systemLoginBackground });
     storage.storeSystemConfiguration({ name: 'login_logo', value: systemLoginLogo });
@@ -483,6 +495,16 @@ describe('App', () => {
               .get(`${sourcePath}/${powerpointRedirect.id}`)
               .expect((res) => {
                 assert.strictEqual(true, res.text.includes(`https://docs.google.com/viewer?url=${powerpointRedirect.destination_url}&embedded=true`));
+              })
+              .expect(200, done);
+          });
+        });
+        context('and mime_type is Image', () => {
+          it('renders Image', (done) => {
+            agent
+              .get(`${sourcePath}/${imageRedirect.id}`)
+              .expect((res) => {
+                assert.strictEqual(true, res.text.includes(imageRedirect.destination_url));
               })
               .expect(200, done);
           });

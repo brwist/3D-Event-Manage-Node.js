@@ -29,6 +29,24 @@ describe('Mime View Selector', () => {
     });
   });
 
+  context('Image', () => {
+    it('selects Image', () => {
+      assert.strictEqual('media/image', mapMimeToView('image/gif'));
+    });
+
+    it('selects Image', () => {
+      assert.strictEqual('media/image', mapMimeToView('image/jpeg'));
+    });
+
+    it('selects Image', () => {
+      assert.strictEqual('media/image', mapMimeToView('image/png'));
+    });
+
+    it('selects Image', () => {
+      assert.strictEqual('media/image', mapMimeToView('image/webp'));
+    });
+  });
+
   context('unknown media', () => {
     it('renders unknown media page', () => {
       assert.strictEqual('media/unknown', mapMimeToView('video/something'));
