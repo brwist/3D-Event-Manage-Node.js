@@ -1,9 +1,17 @@
+<style>
+    .custom-background-color {
+        background-color: {{stylingColor}};
+    }
+    .custom-border-color {
+        border-color: {{stylingColor}};
+    }
+</style>
 <div class="container-fluid fill">
     <div class="logo">
         <img src="{{loginLogo}}" class="logo-dimension" />
     </div>
     <div class="row">
-        <div class="col container-fluid no-padding">
+        <div class="col container-fluid no-padding custom-background-color">
             <img src="{{loginBackground}}" class="login-image" />
         </div>
         <div class="col">
@@ -11,12 +19,12 @@
                 <h1 class="text-center text-uppercase">{{loginPrompt}}</h1>
                 <form class="mt-5" action="{{loginPath}}" method="post">
                     <div class="form-group w-100">
-                        <input type="email" class="form-control mt-5 blue-border login-input" placeholder="name"
+                        <input type="email" class="form-control mt-5 login-input custom-border-color" placeholder="name"
                             name="username"></input>
-                        <input type="password" class="form-control mt-4 login-input" placeholder="password"
+                        <input type="password" class="form-control mt-4 login-input custom-border-color" placeholder="password"
                             name="password"></input>
                     </div>
-                    <input type="submit" value="login" class="btn btn-primary w-100 mt-4 blue-background"></input>
+                    <input type="submit" value="login" class="btn btn-primary w-100 mt-4 custom-background-color"></input>
                 </form>
             </div>
         </div>

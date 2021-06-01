@@ -35,10 +35,15 @@ async function fetchDefaultRedirect(store) {
   return (await fetchSystemConfig(store, 'default_redirect'));
 }
 
+async function fetchStylingColor(store) {
+  return (await fetchSystemConfig(store, 'styling_color'));
+}
+
 module.exports = {
   fetchEventConfig,
   fetchLoginBackground,
   fetchLoginLogo,
   fetchLoginPrompt,
+  fetchStylingColor,
   fetchDefaultRedirect
 }
