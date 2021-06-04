@@ -12,7 +12,7 @@ module.exports = {
     switch(mimeType) {
       case 'application/pdf':
         return 'media/pdf';
-      case (mimeType.match(/video\/quicktime|mp4/) || {}).input:
+      case 'video/mp4':
         return 'media/video';
       case 'application/vnd.ms-powerpoint':
       case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
