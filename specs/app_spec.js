@@ -111,17 +111,6 @@ describe('App', () => {
     disable_downloads: true,
   };
 
-  const downloadableVideoRedirect = {
-    id: 'downloadableVideoRedirectId',
-    client: attendee.client,
-    event: attendee.event,
-    type: 'display',
-    destination_url: 'https://wesite1.com/my-downloadable-video.mp4',
-    presign: false,
-    mime_type: 'video/mp4',
-    disable_downloads: false,
-  };
-
   const powerpointRedirect = {
     id: 'powerpointRedirectId',
     client: attendee.client,
@@ -163,7 +152,6 @@ describe('App', () => {
     storage.storeRedirect(pdfRedirect);
     storage.storeRedirect(downloadablePdfRedirect);
     storage.storeRedirect(videoRedirect);
-    storage.storeRedirect(downloadableVideoRedirect);
     storage.storeRedirect(powerpointRedirect);
     storage.storeRedirect(imageRedirect);
     storage.storeRedirect(kitchenNavigationRedirect);
@@ -475,27 +463,14 @@ describe('App', () => {
           });
         });
         context('and mime_type type is video', () => {
-          context('and video is not downloadable', () => {
-            it('renders video player with no download option', (done) => {
-              agent
-                .get(`${sourcePath}/${videoRedirect.id}`)
-                .expect((res) => {
-                  // response should contain controlsList="nodownload"
-                  assert.strictEqual(true, res.text.includes('controlsList="nodownload"'));
-                })
-                .expect(200, done);
-            });
-          });
-          context('and video is downloadable', () => {
-            it('renders video with download options', (done) => {
-              agent
-                .get(`${sourcePath}/${downloadableVideoRedirect.id}`)
-                .expect((res) => {
-                  // response should not controlsList="nodownload"
-                  assert.strictEqual(false, res.text.includes('controlsList="nodownload"'));
-                })
-                .expect(200, done);
-            });
+          it('renders video player', (done) => {
+            agent
+              .get(`${sourcePath}/${videoRedirect.id}`)
+              .expect((res) => {
+              // should use video.js to
+                assert.strictEqual(true, res.text.includes('https://vjs.zencdn.net/7.11.4/video-js.css'));
+              })
+              .expect(200, done);
           });
         });
         context('and mime_type is PowerPoint', () => {
