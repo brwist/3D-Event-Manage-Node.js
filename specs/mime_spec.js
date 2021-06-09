@@ -17,11 +17,15 @@ describe('Mime View Selector', () => {
 
   context('GView', () => {
     it('selects GView', () => {
-      assert.strictEqual('media/gviewer', mapMimeToView('application/vnd.ms-powerpoint'));
-    });
-
-    it('selects GView', () => {
-      assert.strictEqual('media/gviewer', mapMimeToView('application/vnd.openxmlformats-officedocument.presentationml.presentation'));
+      const mimes = [
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/doc',
+        'application/ms-doc',
+        'application/msword',
+      ];
+      mimes.forEach(mime => assert.strictEqual('media/gviewer', mapMimeToView(mime)));
     });
   });
 

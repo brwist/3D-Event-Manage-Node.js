@@ -14,8 +14,9 @@ module.exports = {
         return 'media/pdf';
       case 'video/mp4':
         return 'media/video';
-      case 'application/vnd.ms-powerpoint':
+      case (mimeType.match(/application\/doc|ms-doc|msword|ms-powerpoint/) || {}).input:
       case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
         return 'media/gviewer';
       case (mimeType.match(/image\/gif|jpeg|png|webp/) || {}).input:
         return 'media/image';
