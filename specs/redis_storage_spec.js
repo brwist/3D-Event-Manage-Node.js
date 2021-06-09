@@ -193,4 +193,36 @@ describe('RedisStorage', () => {
       });
     });
   });
+  context('environmental configuration', () => {
+    const key = 'main_entrance/video.mp4';
+    const value = 'contest/anotherfile.txt';
+    const environmentalConfig = {
+      client,
+      event,
+      key,
+      value,
+    };
+
+    it('stores environmental configuration', () => {
+      subject.storeEnvironmentalConfiguration(environmentalConfig);
+
+      database.hget(`environmental.${client}.${event}`, key, (err, environmentalValue) => {
+        assert.strictEqual(value, environmentalValue);
+      });
+    });
+
+    it('fetches environmental configuration', () => {
+      subject.storeEnvironmentalConfiguration(environmentalConfig);
+
+      subject.retrieveEnvironmentalConfiguration(client, event, key, (environmentalValue) => {
+        assert.strictEqual(value, environmentalValue);
+      });
+    });
+
+    it('returns null when environmental configuration not found', () => {
+      subject.retrieveEnvironmentalConfiguration(client, event, 'random-key', (environmentalValue) => {
+        assert.strictEqual(null, environmentalValue);
+      });
+    });
+  });
 });

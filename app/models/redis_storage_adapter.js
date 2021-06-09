@@ -21,6 +21,10 @@ module.exports = function storage(options) {
     return `event.${client}.${event}`;
   }
 
+  function computeEnvironmentalKey(client, event) {
+    return `environmental.${client}.${event}`;
+  }
+
   function getSystemConfigurationKey() {
     return 'config';
   }
@@ -84,6 +88,17 @@ module.exports = function storage(options) {
       const key = computeEventConfigurationKey(client, event);
       this._database.hget(key, eventKey, (err, reply) => {
         debug('Event Configuration %s %s result: %o error: %o', key, eventKey, reply, err);
+        callback(reply);
+      });
+    },
+    storeEnvironmentalConfiguration(config) {
+      const key = computeEnvironmentalKey(config.client, config.event);
+      this._database.hset(key, config.key, config.value);
+    },
+    retrieveEnvironmentalConfiguration(client, event, configKey, callback) {
+      const key = computeEnvironmentalKey(client, event);
+      this._database.hget(key, configKey, (err, reply) => {
+        debug('Environmental Configuration %s %s result: %o error: %o', key, configKey, reply, err);
         callback(reply);
       });
     },
