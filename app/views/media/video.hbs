@@ -1,12 +1,10 @@
 <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
 <!-- Using City theme-->
 <link href="https://unpkg.com/@videojs/themes@1/dist/city/index.css" rel="stylesheet" />
-<div class="row h-100 align-items-center">
-    <div class="w-50 mx-auto">
-        <video class="video-js vjs-theme-city vjs-big-play-centered" controls autoplay preload="auto" width="full" height="full" data-setup="{}">
-            <source src="{{destination_url}}" type="{{mime_type}}" />
-        </video>
-    </div>
+<div class="row h-100 text-center">
+    <video class="video-js vjs-theme-city vjs-big-play-centered" controls autoplay preload="auto" data-setup="{}">
+        <source src="{{destination_url}}" type="{{mime_type}}" />
+    </video>
 </div>
 
 <script src="https://vjs.zencdn.net/7.11.4/video.min.js"></script>
