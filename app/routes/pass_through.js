@@ -1,11 +1,11 @@
 const express = require('express');
 const s3Proxy = require('s3-proxy');
 const { downloadFromS3 } = require('../utils/s3');
-const { fetchEventConfig } = require('../utils/helpers');
+const { fetchEventConfig, fetchEnvironmentalConfig } = require('../utils/helpers');
 const { NotFoundError } = require('../utils/errors');
 const debug = require('debug')('redis-storage-adapter');
 const experienceBucket = require('../lib/buckets/experience');
-const { experienceBucket: experienceBucketConfig } = require('../configs/aws');
+const { experienceBucket: experienceBucketConfig, contentBucket: contentBucketConfig } = require('../configs/aws');
 
 const router = express.Router({mergeParams: true});
 const hotspotRegex = /labels\.(.+)/g
@@ -38,6 +38,29 @@ module.exports = function(store) {
       }
       throw(error);
     }
+  });
+
+  router.get('/:experience/:file', async (req, res, next) => {
+    let bucket = contentBucketConfig.bucket;
+    let awsConfig = contentBucketConfig.awsConfig;
+    const { client, event, experience, file } = req.params;
+    const environmentalConfig = await fetchEnvironmentalConfig(store, client, event, `${experience}/${file}`);
+
+    if(environmentalConfig) {
+      // s3Proxy determines S3 key based on originalUrl
+      req.originalUrl = `/${client}/${event}/${environmentalConfig}`
+    } else {
+      // If environmentalConfig is not found then proxy content from experience bucket instead
+      bucket = experienceBucketConfig.bucket;
+      awsConfig = experienceBucketConfig.awsConfig;
+    }
+
+    s3Proxy({
+      ...awsConfig,
+       bucket,
+       overrideCacheControl: 'max-age=100000',
+       defaultKey: 'index.html'
+     })(req, res, next);
   });
 
   router.get('*', (req, res, next) => {

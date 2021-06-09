@@ -18,6 +18,15 @@ function fetchSystemConfig(store, systemKey) {
   });
 }
 
+function fetchEnvironmentalConfig(store, client, event, configKey) {
+  return new Promise((resolve, reject) => {
+    // get environmental configuration from Redis
+    store.retrieveEnvironmentalConfiguration(client, event, configKey, (value) => {
+      resolve(value);
+    });
+  });
+}
+
 async function fetchCustomFont(store) {
   return await presignedUrlFromContentBucket(await fetchSystemConfig(store, 'custom_font'));
 }
@@ -44,5 +53,6 @@ module.exports = {
   fetchLoginLogo,
   fetchLoginPrompt,
   fetchStylingColor,
-  fetchDefaultRedirect
+  fetchDefaultRedirect,
+  fetchEnvironmentalConfig
 }

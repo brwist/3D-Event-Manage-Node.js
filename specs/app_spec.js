@@ -505,26 +505,77 @@ describe('App', () => {
     });
 
     context('pass through', () => {
-      const content = '<html><body>Hello</body></html>';
-      let s3;
+      context('room path', () => {
+        context('when environmental config was not set for path', () => {
+          const experienceBucketContent = 'This is experience Bucket';
+          const contentPath = 'room1/mypage.html';
+          let s3;
+          before((done) => {
+            s3 = AWSMock.S3({
+              params: { Bucket: 'experiences' },
+            });
 
-      before((done) => {
-        s3 = AWSMock.S3({
-          params: { Bucket: 'experiences' },
+            s3.putObject({ Key: contentPath, Body: experienceBucketContent }, () => {
+              done();
+            });
+          });
+          it('returns file from experience bucket', (done) => {
+            agent
+              .get(`${eventRoot}/${contentPath}`)
+              .expect((res) => {
+                assert.strictEqual(res.text, experienceBucketContent);
+              })
+              .expect(200, done);
+          });
         });
 
-        s3.putObject({ Key: 'something/something.html', Body: content }, () => {
-          done();
+        context('when environmental config was set for path', () => {
+          const environmentKey = 'room1/page.html';
+          const fileContent = 'This is content Bucket';
+          let s3;
+          before((done) => {
+            storage.storeEnvironmentalConfiguration({ client, event, key: environmentKey, value: 'anotherpage.html' });
+            s3 = AWSMock.S3({
+              params: { Bucket: 'contents' },
+            });
+
+            s3.putObject({ Key: 'anotherpage.html', Body: fileContent }, () => {
+              done();
+            });
+          });
+          it('returns file from content bucket', (done) => {
+            agent
+              .get(`${eventRoot}/${environmentKey}`)
+              .expect((res) => {
+                assert.strictEqual(res.text, fileContent);
+              })
+              .expect(200, done);
+          });
         });
       });
 
-      it('returns the file', (done) => {
-        agent
-          .get(`${eventRoot}/something/something.html`)
-          .expect((res) => {
-            assert.strictEqual(res.text, content);
-          })
-          .expect(200, done);
+      context('other paths', () => {
+        const content = '<html><body>Hello</body></html>';
+        let s3;
+
+        before((done) => {
+          s3 = AWSMock.S3({
+            params: { Bucket: 'experiences' },
+          });
+
+          s3.putObject({ Key: 'something/else/something.html', Body: content }, () => {
+            done();
+          });
+        });
+
+        it('returns the file', (done) => {
+          agent
+            .get(`${eventRoot}/something/else/something.html`)
+            .expect((res) => {
+              assert.strictEqual(res.text, content);
+            })
+            .expect(200, done);
+        });
       });
     });
 
