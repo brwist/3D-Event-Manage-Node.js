@@ -1,6 +1,7 @@
 const redis = require('redis');
 const http = require('http');
 const express = require('express');
+const hbs = require('hbs');
 const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const passport = require('passport');
@@ -84,6 +85,9 @@ app.use(passport.session());
 app.use(express.static(`${__dirname}/app/public`));
 app.set('views', `${__dirname}/app/views`);
 app.set('view engine', 'hbs');
+require('handlebars-helpers').url({
+  handlebars: hbs,
+});
 
 app.use(loadConfig.initialize(store));
 app.get('/:client/:event/login', authentication.loginPage);
