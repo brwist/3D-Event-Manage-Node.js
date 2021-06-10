@@ -1,13 +1,12 @@
 <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
 <!-- Using City theme-->
 <link href="https://unpkg.com/@videojs/themes@1/dist/city/index.css" rel="stylesheet" />
-<div class="row text-center">
-    <video class="video-js vjs-big-play-centered" controls autoplay preload="auto" data-setup="{}">
-        <source src="{{destination_url}}" type="{{mime_type}}" />
-    </video>
-</div>
+<video class="video-js vjs-big-play-centered" controls autoplay preload="auto" data-setup="{}">
+  <source src="{{destination_url}}" type="{{mime_type}}" />
+</video>
 
 <script src="https://vjs.zencdn.net/7.11.4/video.min.js"></script>
 <script>
   document.querySelector('.video-js').height = window.innerHeight;
+  document.querySelector('.video-js').width = window.innerWidth;
 </script>
