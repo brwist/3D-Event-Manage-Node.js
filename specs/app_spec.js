@@ -89,17 +89,6 @@ describe('App', () => {
     disable_downloads: true,
   };
 
-  const downloadablePdfRedirect = {
-    id: 'downloadablePdfRedirectId',
-    client: attendee.client,
-    event: attendee.event,
-    type: 'display',
-    destination_url: 'https://wesite1.com/myDownloadable-file.pdf',
-    presign: false,
-    mime_type: 'application/pdf',
-    disable_downloads: false,
-  };
-
   const videoRedirect = {
     id: 'videoRedirectId',
     client: attendee.client,
@@ -150,7 +139,6 @@ describe('App', () => {
     storage.storeRedirect(redirect);
     storage.storeRedirect(newPageRedirect);
     storage.storeRedirect(pdfRedirect);
-    storage.storeRedirect(downloadablePdfRedirect);
     storage.storeRedirect(videoRedirect);
     storage.storeRedirect(powerpointRedirect);
     storage.storeRedirect(imageRedirect);
@@ -437,29 +425,14 @@ describe('App', () => {
       });
       context('when hotspot has redirect type as display', () => {
         context('and mime_type is application/pdf', () => {
-          context('and pdf is not downloadable', () => {
-            it('renders page with pdf viewer and no nav options', (done) => {
-              agent
-                .get(`${sourcePath}/${pdfRedirect.id}`)
-                .expect((res) => {
-                  // response should not contain nav enabled
-                  assert.strictEqual(true, res.text.includes(`${pdfRedirect.destination_url}#toolbar=0&navpanes=0`));
-                })
-                .expect(200, done);
-            });
-          });
-          context('and pdf is downloadable', () => {
-            it('renders page with pdf viewer and nav options', (done) => {
-              agent
-                .get(`${sourcePath}/${downloadablePdfRedirect.id}`)
-                .expect((res) => {
-                  // response should contain link to pdf
-                  assert.strictEqual(true, res.text.includes(downloadablePdfRedirect.destination_url));
-                  // response should not toolbar set 0
-                  assert.strictEqual(false, res.text.includes(`${downloadablePdfRedirect.destination_url}#toolbar=0&navpanes=0`));
-                })
-                .expect(200, done);
-            });
+          it('renders pdf', (done) => {
+            agent
+              .get(`${sourcePath}/${pdfRedirect.id}`)
+              .expect((res) => {
+              // Pdf should be rendered using pdf.js
+                assert.strictEqual(true, res.text.includes('/pdfjs/web/viewer.html?file='));
+              })
+              .expect(200, done);
           });
         });
         context('and mime_type type is video', () => {
