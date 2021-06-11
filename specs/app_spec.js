@@ -483,9 +483,9 @@ describe('App', () => {
         const filename = 'video.mp4';
         const fileKey = `${room}/${filename}`;
         const contentPath = `${room}/media/${filename}`;
+        const experienceBucketContent = 'This is experience Bucket';
 
         context('when environmental config was not set for path', () => {
-          const experienceBucketContent = 'This is experience Bucket';
           let s3;
           before((done) => {
             s3 = AWSMock.S3({

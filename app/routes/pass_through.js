@@ -41,25 +41,25 @@ module.exports = function(store) {
   });
 
   router.get('/:experience/media/:file', async (req, res, next) => {
-    let bucket = contentBucketConfig.bucket;
-    let awsConfig = contentBucketConfig.awsConfig;
+    debug('Loading media..');
+    let bucket = experienceBucketConfig.bucket;
+    let awsConfig = experienceBucketConfig.awsConfig;
     const { client, event, experience, file } = req.params;
     const environmentalConfig = await fetchEnvironmentalConfig(store, client, event, `${experience}/${file}`);
 
     if(environmentalConfig) {
+      debug(`Environmental Config found ${environmentalConfig}`);
       // s3Proxy determines S3 key based on originalUrl
-      req.originalUrl = `/${client}/${event}/${environmentalConfig}`
-    } else {
-      // If environmentalConfig is not found then proxy content from experience bucket instead
-      bucket = experienceBucketConfig.bucket;
-      awsConfig = experienceBucketConfig.awsConfig;
+      bucket = contentBucketConfig.bucket;
+      awsConfig = contentBucketConfig.awsConfig;
+      req.originalUrl = `/${client}/${event}/${environmentalConfig}`;
     }
 
     s3Proxy({
       ...awsConfig,
        bucket,
        overrideCacheControl: 'max-age=100000',
-       defaultKey: 'index.html'
+       defaultKey: 'index.htm'
      })(req, res, next);
   });
 
@@ -70,7 +70,7 @@ module.exports = function(store) {
      ...awsConfig,
       bucket,
       overrideCacheControl: 'max-age=100000',
-      defaultKey: 'index.html'
+      defaultKey: 'index.htm'
     })(req, res, next);
   });
 
