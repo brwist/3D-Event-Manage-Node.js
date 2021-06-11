@@ -36,7 +36,7 @@ module.exports = function(store) {
       res.locals = {
         destination_url,
         mime_type: redirect.mime_type,
-        disable_downloads: redirect.disable_downloads,
+        allow_download: redirect.allow_download,
       };
 
       switch(redirect.type) {

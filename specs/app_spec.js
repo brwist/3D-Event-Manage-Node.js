@@ -479,9 +479,13 @@ describe('App', () => {
 
     context('pass through', () => {
       context('room path', () => {
+        const room = 'welcomecenter';
+        const filename = 'video.mp4';
+        const fileKey = `${room}/${filename}`;
+        const contentPath = `${room}/media/${filename}`;
+
         context('when environmental config was not set for path', () => {
           const experienceBucketContent = 'This is experience Bucket';
-          const contentPath = 'room1/mypage.html';
           let s3;
           before((done) => {
             s3 = AWSMock.S3({
@@ -492,6 +496,7 @@ describe('App', () => {
               done();
             });
           });
+
           it('returns file from experience bucket', (done) => {
             agent
               .get(`${eventRoot}/${contentPath}`)
@@ -503,22 +508,23 @@ describe('App', () => {
         });
 
         context('when environmental config was set for path', () => {
-          const environmentKey = 'room1/page.html';
+          const replacementFilename = 'othervideo.mp4';
           const fileContent = 'This is content Bucket';
+
           let s3;
           before((done) => {
-            storage.storeEnvironmentalConfiguration({ client, event, key: environmentKey, value: 'anotherpage.html' });
+            storage.storeEnvironmentalConfiguration({ client, event, key: fileKey, value: replacementFilename });
             s3 = AWSMock.S3({
               params: { Bucket: 'contents' },
             });
 
-            s3.putObject({ Key: 'anotherpage.html', Body: fileContent }, () => {
+            s3.putObject({ Key: replacementFilename, Body: fileContent }, () => {
               done();
             });
           });
           it('returns file from content bucket', (done) => {
             agent
-              .get(`${eventRoot}/${environmentKey}`)
+              .get(`${eventRoot}/${contentPath}`)
               .expect((res) => {
                 assert.strictEqual(res.text, fileContent);
               })

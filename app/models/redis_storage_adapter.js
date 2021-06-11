@@ -48,7 +48,7 @@ module.exports = function storage(options) {
         type: value.type,
         presign: value.presign,
         mime_type: value.mime_type,
-        disable_downloads: value.disable_downloads,
+        allow_download: value.allow_download,
       });
       this._database.hset(computeHotspotKey(value.client, value.event), value.id, content);
     },

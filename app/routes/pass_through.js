@@ -40,7 +40,7 @@ module.exports = function(store) {
     }
   });
 
-  router.get('/:experience/:file', async (req, res, next) => {
+  router.get('/:experience/media/:file', async (req, res, next) => {
     let bucket = contentBucketConfig.bucket;
     let awsConfig = contentBucketConfig.awsConfig;
     const { client, event, experience, file } = req.params;

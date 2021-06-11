@@ -2244,7 +2244,7 @@ function webViewerInitialized() {
   const queryString = document.location.search.substring(1);
   const params = (0, _ui_utils.parseQueryString)(queryString);
   file = "file" in params ? params.file : _app_options.AppOptions.get("defaultUrl");
-  validateFileURL(file);
+  //validateFileURL(file);
   const fileInput = document.createElement("input");
   fileInput.id = appConfig.openFileInputName;
   fileInput.className = "fileInput";
@@ -2252,12 +2252,18 @@ function webViewerInitialized() {
   fileInput.oncontextmenu = _ui_utils.noContextMenuHandler;
   document.body.appendChild(fileInput);
 
-  if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
-    appConfig.toolbar.openFile.hidden = true;
-    appConfig.secondaryToolbar.openFileButton.hidden = true;
-  } else {
-    fileInput.value = null;
+  const allowDownload = "allow_download" in params ? params.allow_download == "true" : false;
+
+  if(!allowDownload) {
+    appConfig.toolbar.download.hidden = true;
+    appConfig.toolbar.print.hidden = true;
   }
+
+  appConfig.toolbar.viewBookmark.hidden = true;
+  appConfig.secondaryToolbar.viewBookmarkButton.hidden = true;
+  appConfig.secondaryToolbar.downloadButton.hidden = true;
+  appConfig.toolbar.openFile.hidden = true;
+  appConfig.secondaryToolbar.openFileButton.hidden = true;
 
   fileInput.addEventListener("change", function (evt) {
     const files = evt.target.files;

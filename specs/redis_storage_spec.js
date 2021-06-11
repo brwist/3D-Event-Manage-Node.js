@@ -54,7 +54,7 @@ describe('RedisStorage', () => {
     const destinationUrl = 'https://test.com';
     const tooltip = 'tooltip1';
     const type = 'new_page';
-    const disableDownloads = false;
+    const allowDownload = false;
     const redirect = {
       id: hotspotId,
       client,
@@ -62,7 +62,7 @@ describe('RedisStorage', () => {
       tooltip,
       type,
       destination_url: destinationUrl,
-      disable_downloads: disableDownloads,
+      allow_download: allowDownload,
     };
 
     it('stores url for an event', () => {
@@ -73,7 +73,7 @@ describe('RedisStorage', () => {
         assert.strictEqual(hotspot.destination_url, destinationUrl);
         assert.strictEqual(hotspot.tooltip, tooltip);
         assert.strictEqual(hotspot.type, type);
-        assert.strictEqual(hotspot.disable_downloads, disableDownloads);
+        assert.strictEqual(hotspot.allow_download, allowDownload);
       });
     });
 
@@ -84,7 +84,7 @@ describe('RedisStorage', () => {
         assert.strictEqual(hotspot.destination_url, destinationUrl);
         assert.strictEqual(hotspot.tooltip, tooltip);
         assert.strictEqual(hotspot.type, type);
-        assert.strictEqual(hotspot.disable_downloads, disableDownloads);
+        assert.strictEqual(hotspot.allow_download, allowDownload);
       });
     });
   });
