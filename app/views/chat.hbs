@@ -1,0 +1,83 @@
+<script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.32.1.js"></script>
+
+<div class="page-content page-container" id="page-content">
+  <div class="padding">
+    <div class="row container d-flex justify-content-center">
+      <div class="col-md-6">
+        <div class="card card-bordered">
+          <div class="ps-container ps-theme-default ps-active-y" id="chat-content"
+            style="overflow-y: scroll !important; height:400px !important;">
+          </div>
+          <div class="ps-scrollbar-x-rail" style="left: 0px; bottom: 0px;">
+            <div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+          </div>
+          <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; right: 2px;">
+            <div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 2px;"></div>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <div class="input-group">
+            <input id="message-input" type="text" class="form-control input-sm chat_input"
+              placeholder="Write your message here..." />
+            <span class="input-group-btn">
+              <button class="btn btn-primary btn-sm" onclick="publishMessage()">Send</button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const decodedJson = decodeURIComponent("{{{encodedJson}}}");
+  const jsonObj = JSON.parse(decodedJson);
+  const roomName = jsonObj.client + "." + jsonObj.event
+  const pubnub = new PubNub({
+    publishKey: jsonObj.publishKey,
+    subscribeKey: jsonObj.subscribeKey,
+    uuid: jsonObj.userName,
+  });
+  pubnub.subscribe({
+    channels: [roomName]
+  });
+  pubnub.addListener({
+    message: function (m) {
+      let ui = createMessageView(m)
+      const chatContent = document.getElementById('chat-content');
+      chatContent.append(ui)
+    }
+  });
+
+  function publishMessage() {
+    const msgInput = document.getElementById('message-input');
+    const message = msgInput.value;
+
+    if (message == "") {
+      return null;
+    }
+
+    let publishPayload = {
+      channel: roomName,
+      message: {
+        description: message,
+        time: Date.now()
+      }
+    }
+
+    pubnub.publish(publishPayload, function (status, response) {
+      msgInput.value = "";
+    })
+  }
+
+  function createMessageView(msg) {
+    let messagedTime = new Date(msg.message.time);
+    let date = messagedTime.getFullYear() + '-' + (messagedTime.getMonth() + 1) + '-' + messagedTime.getDate();
+    let time = messagedTime.getHours() + ':' + messagedTime.getMinutes() + ':' + messagedTime.getSeconds();
+    let dateTime = date + ' ' + time;
+    let node = document.createElement('div');
+    node.className = msg.publisher === jsonObj.userName ? 'media media-chat' : 'media media-chat media-chat-reverse';
+    node.innerHTML = '<div class="media-body"><p>' + msg.message.description + '</p><p class="meta"><time datetime="' + date + '">' + time + '</time></p><div>';
+    return node;
+  }
+</script>
