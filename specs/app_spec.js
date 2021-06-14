@@ -354,6 +354,18 @@ describe('App', () => {
       });
     });
 
+    context('chat', () => {
+      const chatUrl = `${eventRoot}/chat`;
+      it('shows UI to chat using Pubsub', (done) => {
+        agent
+          .get(chatUrl)
+          .expect((res) => {
+            assert.strictEqual(true, res.text.includes('https://cdn.pubnub.com/sdk/javascript/pubnub.4.32.1.js'));
+          })
+          .expect(200, done);
+      });
+    });
+
     context('hotspots', () => {
       context('when hotspot has presign set true', () => {
         context('and redirect type is new_page', () => {
@@ -429,7 +441,7 @@ describe('App', () => {
             agent
               .get(`${sourcePath}/${pdfRedirect.id}`)
               .expect((res) => {
-              // Pdf should be rendered using pdf.js
+                // Pdf should be rendered using pdf.js
                 assert.strictEqual(true, res.text.includes('/pdfjs/web/viewer.html?file='));
               })
               .expect(200, done);
@@ -440,7 +452,7 @@ describe('App', () => {
             agent
               .get(`${sourcePath}/${videoRedirect.id}`)
               .expect((res) => {
-              // should use video.js to
+                // should use video.js to
                 assert.strictEqual(true, res.text.includes('https://vjs.zencdn.net/7.11.4/video-js.css'));
               })
               .expect(200, done);
