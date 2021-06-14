@@ -13,6 +13,7 @@ const Attendee = require('./app/models/attendee');
 const hotspots = require('./app/routes/hotspots');
 const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
+const chat = require('./app/routes/chat')
 const { redirectToEvent } = require('./app/utils/redirect');
 const { fetchDefaultRedirect } = require('./app/utils/helpers');
 const loadConfig = require('./app/middlewares/load_config');
@@ -104,6 +105,8 @@ app.get('/:client/:event/attendees', authentication.redirectUnauthenticated, (re
   res.locals = { attendees };
   res.render('attendees');
 });
+
+app.use('/:client/:event/chat', authentication.redirectUnauthenticated, chat);
 
 app.use('/:client/:event', authentication.redirectUnauthenticated, passThrough(store));
 
