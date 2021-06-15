@@ -346,3 +346,17 @@ textarea {
 .text-info {
   color: #48b0f7 !important
 }
+
+.wrapping-content {
+  flex-basis: 35%;
+}
+.wrapped-content {
+  flex-basis: 25%;
+}
+.countdown-text {
+  font-size: 50px;
+}
+.countdown-logo {
+  max-width: 200px;
+  max-height: 300px;
+}
