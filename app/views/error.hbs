@@ -1,3 +1,22 @@
-<h1>{{message}}</h1>
-<h2>{{error.status}}</h2>
-<pre>{{error.stack}}</pre>
+<style>
+  .custom-background-color {
+    background-color: {{stylingColor}};
+  }
+  .custom-font {
+    font-family: {{stylingFont}};
+  }
+</style>
+
+<div class="d-flex  vh-100 flex-column">
+  <div class="d-flex flex-grow-1  align-items-center justify-content-center custom-background-color wrapping-content">
+    <h1> {{message}} </h1>
+  </div>
+  <div class="flex-grow-1 d-flex align-items-center justify-content-center fs-2 wrapped-content">
+    <h2>{{error.status}}</h2>
+    <pre>{{error.stack}}</pre>
+  </div>
+  <div
+    class="flex-grow-1 d-flex flex-column align-items-center justify-content-center custom-background-color wrapping-content ">
+  </div>
+</div>
+</div>
