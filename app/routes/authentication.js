@@ -1,5 +1,6 @@
 const { redirectToLogin } = require('../utils/redirect')
 const { fetchEventConfig, fetchLoginLogo, fetchLoginPrompt, fetchEnvironmentalConfig } = require('../utils/helpers');
+const { presignedUrlFromContentBucket } = require('../utils/s3');
 
 function isAuthenticated(req) {
   const {client, event} = req.params;
@@ -67,10 +68,12 @@ module.exports = (store, passport) => {
 
                 // event has not started yet
                 if (parseInt(startTime, 10) > now) {
+                  const logoS3Key =  await fetchEnvironmentalConfig(store, client, event, 'landing_logo');
                   res.locals.encodedJson =  encodeURIComponent(JSON.stringify({startTime}));
-                  res.locals.logo = await fetchLoginLogo(store);
-                  res.locals.message = await fetchEnvironmentalConfig(store, client, event, 'waiting_page_prompt');
-                  res.locals.timerColor = await fetchEnvironmentalConfig(store, client, event, 'timer_color');;
+                  res.locals.logo = await presignedUrlFromContentBucket(logoS3Key);
+                  res.locals.prompt = await fetchEnvironmentalConfig(store, client, event, 'landing_prompt');
+                  res.locals.backgroundColor = await fetchEnvironmentalConfig(store, client, event, 'landing_background_color');
+                  res.locals.foregroundColor = await fetchEnvironmentalConfig(store, client, event, 'landing_foreground_color');;
                   return res.render('event_waiting_page');
                 } else if (parseInt(endTime, 10) < now) { // event has expired
                   return res.render('event_expired_page');
