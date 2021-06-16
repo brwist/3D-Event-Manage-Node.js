@@ -3,6 +3,7 @@ const url = require('url');
 const { NotFoundError } = require('../utils/errors');
 const { presignedUrlFromContentBucket } = require('../utils/s3');
 const { mapMimeToView } = require('../configs/mime');
+const { fetchEnvironmentalConfig } = require('../utils/helpers');
 
 const router = express.Router();
 
@@ -40,7 +41,10 @@ module.exports = function(store) {
       };
 
       switch(redirect.type) {
-        case 'new_page': 
+        case 'new_page':
+          const {client, event} = req.params;
+          res.locals.backgroundColor = await fetchEnvironmentalConfig(store, client, event, 'landing_background_color');
+          res.locals.foregroundColor = await fetchEnvironmentalConfig(store, client, event, 'landing_foreground_color');
           return res.render('hotspots_redirect');
         case 'display':
           const renderPage = mapMimeToView(redirect.mime_type)

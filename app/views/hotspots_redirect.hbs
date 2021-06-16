@@ -1,1 +1,21 @@
-<a href="{{destination_url}}" target="_blank">{{destination_url}}</a>
+
+<style>
+  .custom-background-color {
+    background-color:{{backgroundColor}};
+  }
+  .custom-timer-color {
+    color: {{foregroundColor}}
+  }
+</style>
+
+<div class="d-flex  vh-100 flex-column">
+  <div class="d-flex flex-grow-1  align-items-center justify-content-center custom-background-color wrapping-content">
+  </div>
+  <div class="flex-grow-1 d-flex align-items-center justify-content-center fs-2 wrapped-content">
+    <a href="{{destination_url}}" target="_blank">{{destination_url}}</a>
+  </div>
+  <div
+    class="flex-grow-1 d-flex flex-column align-items-center justify-content-center custom-background-color wrapping-content ">
+  </div>
+</div>
+</div>
