@@ -31,7 +31,7 @@ async function fetchCustomFont(store) {
   return await presignedUrlFromContentBucket(await fetchSystemConfig(store, 'custom_font'));
 }
 
-async function fetchLoginLogo(store, client, event) {
+async function fetchLoginLogo(store) {
   return await presignedUrlFromContentBucket(await fetchSystemConfig(store, 'login_logo'));
 }
 
