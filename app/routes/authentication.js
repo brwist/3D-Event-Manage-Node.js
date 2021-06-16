@@ -1,5 +1,5 @@
 const { redirectToLogin } = require('../utils/redirect')
-const { fetchEventConfig, fetchLoginLogo, fetchLoginPrompt, fetchWaitingPagePrompt, fetchTimerColor } = require('../utils/helpers');
+const { fetchEventConfig, fetchLoginLogo, fetchLoginPrompt, fetchEnvironmentalConfig } = require('../utils/helpers');
 
 function isAuthenticated(req) {
   const {client, event} = req.params;
@@ -69,8 +69,8 @@ module.exports = (store, passport) => {
                 if (parseInt(startTime, 10) > now) {
                   res.locals.encodedJson =  encodeURIComponent(JSON.stringify({startTime}));
                   res.locals.logo = await fetchLoginLogo(store);
-                  res.locals.message = await fetchWaitingPagePrompt(store);
-                  res.locals.timerColor = await fetchTimerColor(store);
+                  res.locals.message = await fetchEnvironmentalConfig(store, client, event, 'waiting_page_prompt');
+                  res.locals.timerColor = await fetchEnvironmentalConfig(store, client, event, 'timer_color');;
                   return res.render('event_waiting_page');
                 } else if (parseInt(endTime, 10) < now) { // event has expired
                   return res.render('event_expired_page');

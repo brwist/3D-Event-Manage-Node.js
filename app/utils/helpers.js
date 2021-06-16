@@ -47,22 +47,12 @@ async function fetchStylingColor(store) {
   return (await fetchSystemConfig(store, 'styling_color'));
 }
 
-async function fetchWaitingPagePrompt(store) {
-  return (await fetchSystemConfig(store, 'waiting_page_prompt'));
-}
-
-async function fetchTimerColor(store) {
-  return (await fetchSystemConfig(store, 'timer_color'));
-}
-
 module.exports = {
   fetchEventConfig,
   fetchCustomFont,
   fetchLoginLogo,
-  fetchTimerColor,
   fetchLoginPrompt,
   fetchStylingColor,
   fetchDefaultRedirect,
-  fetchWaitingPagePrompt,
   fetchEnvironmentalConfig
 }
