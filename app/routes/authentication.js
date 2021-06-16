@@ -65,15 +65,14 @@ module.exports = (store, passport) => {
                 const now = new Date().getTime();
                 const startTime = await fetchEventConfig(store, client, event, 'start_time');
                 const endTime = await fetchEventConfig(store, client, event, 'end_time');
-
+                res.locals.backgroundColor = await fetchEnvironmentalConfig(store, client, event, 'landing_background_color');
+                res.locals.foregroundColor = await fetchEnvironmentalConfig(store, client, event, 'landing_foreground_color');
                 // event has not started yet
                 if (parseInt(startTime, 10) > now) {
                   const logoS3Key =  await fetchEnvironmentalConfig(store, client, event, 'landing_logo');
                   res.locals.encodedJson =  encodeURIComponent(JSON.stringify({startTime}));
                   res.locals.logo = await presignedUrlFromContentBucket(logoS3Key);
                   res.locals.prompt = await fetchEnvironmentalConfig(store, client, event, 'landing_prompt');
-                  res.locals.backgroundColor = await fetchEnvironmentalConfig(store, client, event, 'landing_background_color');
-                  res.locals.foregroundColor = await fetchEnvironmentalConfig(store, client, event, 'landing_foreground_color');;
                   return res.render('event_waiting_page');
                 } else if (parseInt(endTime, 10) < now) { // event has expired
                   return res.render('event_expired_page');
