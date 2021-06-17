@@ -120,9 +120,8 @@ module.exports = function storage(options) {
     storeRoomAttendee(room, attendee) {
       const genericKey = computeRoomAttendeesGenericKey(attendee.client, attendee.event, room);
       const key = `${genericKey}.${attendee.email}`;
-      this._database.set(key, attendee.serialize());
-      // delete key after 2 minutes
-      this._database.expire(genericKey, 2 * 60);
+      // Use TTL of 2 minutes
+      this._database.setex(key, 2 * 60, attendee.name);
     },
     listRoomAttendee(client, event, room, callback) {
       const genericKey = computeRoomAttendeesGenericKey(client, event, room);
@@ -135,9 +134,7 @@ module.exports = function storage(options) {
             resolve(user);
           });
         }));
-        Promise.all(promises).then((users) => {
-          callback(users.map(attendee => Attendee.restore(attendee)));
-        });
+        Promise.all(promises).then(userNames => callback(userNames));
       });
     },
   };

@@ -248,15 +248,15 @@ describe('RedisStorage', () => {
     it('stores attendees visiting given room', () => {
       subject.storeRoomAttendee(room, attendee1);
 
-      database.get(`room_attendee.${attendee1.client}.${attendee1.event}.${room}.${attendee1.email}`, (err, reply) => {
-        assert(attendee1.isEqual(Attendee.restore(reply)));
+      database.get(`room_attendee.${attendee1.client}.${attendee1.event}.${room}.${attendee1.email}`, (err, name) => {
+        assert.deepStrictEqual(attendee1.name, name);
       });
     });
     it('fetches attendees visiting given room', () => {
       subject.storeRoomAttendee(room, attendee2);
 
       subject.listRoomAttendee(client, event, room, (roomAttendees) => {
-        assert.strictEqual([attendee1, attendee2], roomAttendees);
+        assert.strictEqual([attendee1.name, attendee2.name], roomAttendees);
       });
     });
   });

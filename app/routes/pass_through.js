@@ -66,8 +66,7 @@ module.exports = function(store) {
 
   router.get('/:experience/attendees', roomAttendeeTracker.track(store), async (req, res) => {
     const { client, event, experience } = req.params;
-    const userInRoom = await fetchCurrentRoomAttendees(store, client, event, experience);
-    const attendees = userInRoom.map(user => user.name);
+    const attendees = await fetchCurrentRoomAttendees(store, client, event, experience);
     res.locals = { attendees };
     res.render('attendees');
   });
