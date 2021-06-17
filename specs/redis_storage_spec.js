@@ -225,4 +225,39 @@ describe('RedisStorage', () => {
       });
     });
   });
+  context('room Attendee', () => {
+    let attendee1; let
+      attendee2;
+    const room = 'hall';
+    before(() => {
+      attendee1 = new Attendee({
+        client: 'a_client',
+        event: 'an_event',
+        name: 'Pedro Pepito',
+        email,
+        password: 'abcdefg09876',
+      });
+      attendee2 = new Attendee({
+        client: 'a_client',
+        event: 'an_event',
+        name: 'Other Attendee',
+        email: 'otherperson@gmail.com',
+        password: 'abcdefg09876',
+      });
+    });
+    it('stores attendees visiting given room', () => {
+      subject.storeRoomAttendee(room, attendee1);
+
+      database.get(`room_attendee.${attendee1.client}.${attendee1.event}.${room}.${attendee1.email}`, (err, reply) => {
+        assert(attendee1.isEqual(Attendee.restore(reply)));
+      });
+    });
+    it('fetches attendees visiting given room', () => {
+      subject.storeRoomAttendee(room, attendee2);
+
+      subject.listRoomAttendee(client, event, room, (roomAttendees) => {
+        assert.strictEqual([attendee1, attendee2], roomAttendees);
+      });
+    });
+  });
 });

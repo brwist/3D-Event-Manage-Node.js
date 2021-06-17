@@ -5,6 +5,10 @@ const Attendee = require('./attendee');
 const { marshall, unMarshall } = require('../utils/parser');
 
 module.exports = function storage(options) {
+  function computeRoomAttendeesGenericKey(client, event, room) {
+    return `room_attendee.${client}.${event}.${room}`;
+  }
+
   function computeEventKey(client, event) {
     return `attendee.${client}.${event}`;
   }
@@ -111,6 +115,29 @@ module.exports = function storage(options) {
       this._database.hget(key, configKey, (err, reply) => {
         debug('System Configuration %s %s result: %o error: %o', key, configKey, reply, err);
         callback(reply);
+      });
+    },
+    storeRoomAttendee(room, attendee) {
+      const genericKey = computeRoomAttendeesGenericKey(attendee.client, attendee.event, room);
+      const key = `${genericKey}.${attendee.email}`;
+      this._database.set(key, attendee.serialize());
+      // delete key after 2 minutes
+      this._database.expire(genericKey, 2 * 60);
+    },
+    listRoomAttendee(client, event, room, callback) {
+      const genericKey = computeRoomAttendeesGenericKey(client, event, room);
+      this._database.keys(`${genericKey}.*`, (err, keys) => {
+        const promises = keys.map(key => new Promise((resolve, reject) => {
+          this._database.get(key, (userGetErr, user) => {
+            if (userGetErr) {
+              reject(userGetErr);
+            }
+            resolve(user);
+          });
+        }));
+        Promise.all(promises).then((users) => {
+          callback(users.map(attendee => Attendee.restore(attendee)));
+        });
       });
     },
   };
