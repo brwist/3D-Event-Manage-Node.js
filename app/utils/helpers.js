@@ -27,6 +27,15 @@ function fetchEnvironmentalConfig(store, client, event, configKey) {
   });
 }
 
+function fetchCurrentRoomAttendees(store, client, event, room) {
+  return new Promise((resolve, reject) => {
+    // get room attendees from Redis
+    store.listRoomAttendee(client, event, room, (attendees) => {
+      resolve(attendees);
+    });
+  });
+}
+
 async function fetchCustomFont(store) {
   return await presignedUrlFromContentBucket(await fetchSystemConfig(store, 'custom_font'));
 }
@@ -54,5 +63,6 @@ module.exports = {
   fetchLoginPrompt,
   fetchStylingColor,
   fetchDefaultRedirect,
-  fetchEnvironmentalConfig
+  fetchEnvironmentalConfig,
+  fetchCurrentRoomAttendees
 }

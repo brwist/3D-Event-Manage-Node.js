@@ -490,6 +490,18 @@ describe('App', () => {
     });
 
     context('pass through', () => {
+      context('list attendees in room', () => {
+        const roomName = 'room1';
+        it('should list attendees visiting a room', (done) => {
+          agent
+            .get(`${eventRoot}/${roomName}/attendees`)
+            .expect((res) => {
+              assert.strictEqual(true, res.text.includes(attendee.name));
+            })
+            .expect(200, done);
+        });
+      });
+
       context('room path', () => {
         const room = 'welcomecenter';
         const filename = 'video.mp4';

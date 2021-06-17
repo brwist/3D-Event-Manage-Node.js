@@ -1,10 +1,11 @@
 const express = require('express');
 const s3Proxy = require('s3-proxy');
 const { downloadFromS3 } = require('../utils/s3');
-const { fetchEventConfig, fetchEnvironmentalConfig } = require('../utils/helpers');
+const { fetchEventConfig, fetchEnvironmentalConfig, fetchCurrentRoomAttendees } = require('../utils/helpers');
 const { NotFoundError } = require('../utils/errors');
 const debug = require('debug')('redis-storage-adapter');
 const experienceBucket = require('../lib/buckets/experience');
+const roomAttendeeTracker = require('../middlewares/room_attendee_tracker');
 const { experienceBucket: experienceBucketConfig, contentBucket: contentBucketConfig } = require('../configs/aws');
 
 const router = express.Router({mergeParams: true});
@@ -18,7 +19,7 @@ module.exports = function(store) {
     res.redirect(`/${client}/${event}/${experience}/index.htm`);
   });
 
-  router.get('/:experience/locale/en.txt', async (req, res) => {
+  router.get('/:experience/locale/en.txt', roomAttendeeTracker.track(store), async (req, res) => {
     debug('Processing en.txt...');
     try {
       const experience = req.params.experience;
@@ -40,7 +41,7 @@ module.exports = function(store) {
     }
   });
 
-  router.get('/:experience/media/:file', async (req, res, next) => {
+  router.get('/:experience/media/:file', roomAttendeeTracker.track(store), async (req, res, next) => {
     debug('Loading media..');
     let bucket = experienceBucketConfig.bucket;
     let awsConfig = experienceBucketConfig.awsConfig;
@@ -61,6 +62,14 @@ module.exports = function(store) {
        overrideCacheControl: 'max-age=100000',
        defaultKey: 'index.htm'
      })(req, res, next);
+  });
+
+  router.get('/:experience/attendees', roomAttendeeTracker.track(store), async (req, res) => {
+    const { client, event, experience } = req.params;
+    const userInRoom = await fetchCurrentRoomAttendees(store, client, event, experience);
+    const attendees = userInRoom.map(user => user.name);
+    res.locals = { attendees };
+    res.render('attendees');
   });
 
   router.get('*', (req, res, next) => {
