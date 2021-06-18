@@ -459,11 +459,11 @@ describe('App', () => {
           });
         });
         context('and mime_type is PowerPoint', () => {
-          it('renders PowerPoint', (done) => {
+          it('renders PowerPoint with Google view', (done) => {
             agent
               .get(`${sourcePath}/${powerpointRedirect.id}`)
               .expect((res) => {
-                assert.strictEqual(true, res.text.includes(`https://docs.google.com/gview?url=${powerpointRedirect.destination_url}&embedded=true`));
+                assert.strictEqual(true, res.text.includes('https://docs.google.com/gview?url'));
               })
               .expect(200, done);
           });

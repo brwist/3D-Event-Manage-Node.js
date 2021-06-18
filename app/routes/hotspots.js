@@ -3,7 +3,7 @@ const url = require('url');
 const { NotFoundError } = require('../utils/errors');
 const { presignedUrlFromContentBucket } = require('../utils/s3');
 const { mapMimeToView } = require('../configs/mime');
-const { fetchEnvironmentalConfig } = require('../utils/helpers');
+const { fetchEventConfig } = require('../utils/helpers');
 
 const router = express.Router();
 
