@@ -43,8 +43,8 @@ module.exports = function(store) {
       switch(redirect.type) {
         case 'new_page':
           const {client, event} = req.params;
-          res.locals.backgroundColor = await fetchEnvironmentalConfig(store, client, event, 'landing_background_color');
-          res.locals.foregroundColor = await fetchEnvironmentalConfig(store, client, event, 'landing_foreground_color');
+          res.locals.backgroundColor = await fetchEventConfig(store, client, event, 'landing_background_color');
+          res.locals.foregroundColor = await fetchEventConfig(store, client, event, 'landing_foreground_color');
           return res.render('hotspots_redirect');
         case 'display':
           const renderPage = mapMimeToView(redirect.mime_type)
