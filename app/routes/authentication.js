@@ -82,11 +82,13 @@ module.exports = (store, passport) => {
                 } else if (parseInt(endTime, 10) < now) { // event has expired
                   return res.render('event_expired_page');
                 }
+                debug('redirecting to event root');
                 return res.redirect(`/${client}/${event}`);
               });
             }
           })(req, res, next);
         } catch (err) {
+          debug('error %O', err);
           next(err);
         }
       }
