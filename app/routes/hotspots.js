@@ -40,11 +40,10 @@ module.exports = function(store) {
         allow_download: redirect.allow_download,
       };
 
+      res.locals.backgroundColor = await fetchEventConfig(store, req.user.client, req.user.event, 'landing_background_color');
+      res.locals.foregroundColor = await fetchEventConfig(store, req.user.client, req.user.event, 'landing_foreground_color');
       switch(redirect.type) {
         case 'new_page':
-          const {client, event} = req.params;
-          res.locals.backgroundColor = await fetchEventConfig(store, client, event, 'landing_background_color');
-          res.locals.foregroundColor = await fetchEventConfig(store, client, event, 'landing_foreground_color');
           return res.render('hotspots_redirect');
         case 'display':
           const renderPage = mapMimeToView(redirect.mime_type)
