@@ -17,7 +17,7 @@ const chat = require('./app/routes/chat');
 const { redirectToEvent } = require('./app/utils/redirect');
 const { fetchDefaultRedirect } = require('./app/utils/helpers');
 const loadConfig = require('./app/middlewares/load_config');
-const handleErrors = require('./app/middlewares/error');
+const errorHandler = require('./app/middlewares/error');
 
 const privateKey = process.env.SESSION_KEY;
 
@@ -119,7 +119,7 @@ app.use('*', async (req, res) => {
   }
 });
 
-app.use(handleErrors);
+app.use(errorHandler.handle(store));
 
 if (__filename === process.argv[1]) {
   const port = process.env.PORT || '5000';
