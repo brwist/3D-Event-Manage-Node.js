@@ -1,4 +1,5 @@
-const { redirectToLogin } = require('../utils/redirect')
+const debug = require('debug')('authentication');
+const { redirectToLogin } = require('../utils/redirect');
 const { fetchEventConfig, fetchLoginLogo, fetchLoginPrompt } = require('../utils/helpers');
 const { presignedUrlFromContentBucket } = require('../utils/s3');
 
@@ -39,6 +40,7 @@ module.exports = (store, passport) => {
       redirectUnauthenticated,
       loginPage: async (req, res) => {
         if (isAuthenticated(req)) {
+          debug('attendee is authenticated redirecting...');
           const {client, event} = req.params;
           res.redirect(`/${client}/${event}`);
         } else {
@@ -55,9 +57,11 @@ module.exports = (store, passport) => {
         try {
           passport.authenticate('local', (err, user) => {
             if (err || !user) {
+              debug('attendee error authenticating');
               redirectToLogin(req, res);
             } else {
               req.logIn(user, async (loginErr) => {
+                debug('attendee authenticating');
                 if (loginErr) {
                   throw loginErr;
                 }
