@@ -53,15 +53,16 @@ module.exports = (store, passport) => {
       },
       login: async (req, res, next) => {
         const {client, event} = req.params;
+        debug('attendee authenticating');
 
         try {
           passport.authenticate('local', (err, user) => {
             if (err || !user) {
-              debug('attendee error authenticating');
+              debug('error authenticating');
               redirectToLogin(req, res);
             } else {
               req.logIn(user, async (loginErr) => {
-                debug('attendee authenticating');
+                debug('attendee logIn');
                 if (loginErr) {
                   throw loginErr;
                 }
