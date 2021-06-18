@@ -15,7 +15,7 @@ const passThrough = require('./app/routes/pass_through');
 const createStorage = require('./app/models/redis_storage_adapter');
 const chat = require('./app/routes/chat');
 const { redirectToEvent } = require('./app/utils/redirect');
-const { fetchDefaultRedirect } = require('./app/utils/helpers');
+const { fetchDefaultRedirect, fetchEventConfig } = require('./app/utils/helpers');
 const loadConfig = require('./app/middlewares/load_config');
 const errorHandler = require('./app/middlewares/error');
 
@@ -97,12 +97,14 @@ app.get('/:client/:event/logout', authentication.logout);
 
 app.use('/hotspots', authentication.ensureAuthenticated, hotspots(store));
 
-app.get('/:client/:event/attendees', authentication.redirectUnauthenticated, (req, res) => {
+app.get('/:client/:event/attendees', authentication.redirectUnauthenticated, async (req, res) => {
+  const { client, event } = req.params;
   const attendees = Object.values(req.sessionStore.sessions)
     .map(sessionsStore => JSON.parse(sessionsStore))
     .map(parsedSession => JSON.parse(parsedSession.passport.user))
     .map(user => user.name);
-  res.locals = { attendees };
+  const backgroundColor = await fetchEventConfig(store, client, event, 'landing_background_color');
+  res.locals = { attendees, backgroundColor };
   res.render('attendees');
 });
 

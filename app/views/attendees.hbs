@@ -1,5 +1,25 @@
-<ul>
-  {{#each attendees}}
-    <li>{{this}}</li>
-  {{/each}}
-</ul>
+<style>
+  .custom-background-color {
+    background-color:{{backgroundColor}};
+  }
+
+  .custom-font {
+    font-family: {{stylingFont}}
+  }
+</style>
+
+<div class="d-flex  vh-100 flex-column">
+  <div class="d-flex flex-grow-1  align-items-center justify-content-center custom-background-color wrapping-content">
+  </div>
+  <div class="flex-grow-1 d-flex align-items-center justify-content-center fs-2 wrapped-content">
+    <ul>
+      {{#each attendees}}
+      <li>{{this}}</li>
+      {{/each}}
+    </ul>
+  </div>
+  <div
+    class="flex-grow-1 d-flex flex-column align-items-center justify-content-center custom-background-color wrapping-content ">
+  </div>
+</div>
+</div>

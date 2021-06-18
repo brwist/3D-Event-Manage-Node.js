@@ -67,7 +67,8 @@ module.exports = function(store) {
   router.get('/:experience/attendees', roomAttendeeTracker.track(store), async (req, res) => {
     const { client, event, experience } = req.params;
     const attendees = await fetchCurrentRoomAttendees(store, client, event, experience);
-    res.locals = { attendees };
+    const backgroundColor = await fetchEventConfig(store, client, event, 'landing_background_color');
+    res.locals = { attendees, backgroundColor };
     res.render('attendees');
   });
 
